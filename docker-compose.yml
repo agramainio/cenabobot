@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:17
+    container_name: cenabobot_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cenabobot
+      POSTGRES_USER: cenabobot_user
+      POSTGRES_PASSWORD: cenabobot_dev_password
+    ports:
+      - "55433:5432"
+    volumes:
+      - cenabobot_pgdata:/var/lib/postgresql/data
+
+volumes:
+  cenabobot_pgdata:

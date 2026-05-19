@@ -1,0 +1,53 @@
+id: split_pea_carrot_soup
+title: Soupe pois cassés-carottes
+short_description: Soupe économique, très simple et nourrissante.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 40
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pois cassés
+    quantity: 180
+    unit: g
+    category: épicerie
+    optional: false
+  - name: carottes
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: bouillon de légumes
+    quantity: 800
+    unit: ml
+    category: épicerie
+    optional: false
+  - name: laurier
+    quantity: 1
+    unit: feuille
+    category: herbes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Faire revenir l’oignon et les carottes. Ajouter les pois cassés et le bouillon.
+  Cuire jusqu’à tendreté. Mixer ou garder tel quel.
+concerns_or_tag_ambiguity: >-
+  Pas fast, car les pois cassés demandent souvent 35 à 45 minutes de cuisson.

@@ -1,0 +1,53 @@
+id: dairy_free_spinach_pesto_pasta
+title: Pâtes au pesto d’épinards sans fromage
+short_description: Pâtes vertes rapides avec sauce maison simple sans fromage.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 12
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: pâtes complètes
+    quantity: 180
+    unit: g
+    category: épicerie
+    optional: false
+  - name: épinards
+    quantity: 120
+    unit: g
+    category: légumes
+    optional: false
+  - name: noix ou graines de tournesol
+    quantity: 30
+    unit: g
+    category: épicerie
+    optional: true
+  - name: ail
+    quantity: 0.5
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+  - name: huile d’olive
+    quantity: 2
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Mixer les épinards avec l’huile, le citron, l’ail et les graines. Mélanger avec
+  les pâtes cuites.
+concerns_or_tag_ambiguity: >-
+  Préciser sans fromage pour éviter la confusion avec un pesto classique au parmesan.

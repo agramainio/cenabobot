@@ -1,0 +1,47 @@
+id: buckwheat_galettes_egg_spinach
+title: Galettes de sarrasin œuf-épinards
+short_description: Galettes rapides avec œuf et légumes.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: galettes de sarrasin
+    quantity: 4
+    unit: pièces
+    category: frais
+    optional: false
+  - name: œufs
+    quantity: 4
+    unit: pièces
+    category: frais
+    optional: false
+  - name: épinards
+    quantity: 200
+    unit: g
+    category: légumes
+    optional: false
+  - name: champignons
+    quantity: 150
+    unit: g
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Réchauffer les galettes, garnir d’épinards poêlés et d’un œuf.
+concerns_or_tag_ambiguity: >-
+  Ne pas ajouter de fromage si dairy_free doit rester vrai. Vérifier les galettes industrielles.

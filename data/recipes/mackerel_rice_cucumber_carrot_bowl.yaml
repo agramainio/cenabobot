@@ -1,0 +1,51 @@
+id: mackerel_rice_cucumber_carrot_bowl
+title: Riz, maquereau, concombre et carottes râpées
+short_description: Bol froid ou tiède avec poisson en boîte.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - no_meat
+  - contains_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: riz
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: maquereau en boîte
+    quantity: 1
+    unit: boîte
+    category: poisson
+    optional: false
+  - name: concombre
+    quantity: 0.5
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: carottes
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: true
+notes: >-
+  Cuire le riz. Ajouter le maquereau, les crudités et le citron.
+concerns_or_tag_ambiguity: >-
+  Vérifier la sauce du maquereau. Éviter les versions à la crème si dairy_free doit rester vrai.

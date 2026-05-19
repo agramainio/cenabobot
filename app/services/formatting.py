@@ -6,17 +6,17 @@ from html import escape
 from app.db.models import Recipe, RecipeIngredient, RecipeTag
 
 TAG_LABELS = {
-    "vegetarian": "vegetarian",
-    "no_meat": "no meat",
-    "no_fish": "no fish",
-    "lactose_free": "lactose-free",
-    "dairy_free": "dairy-free",
-    "contains_egg": "contains egg",
-    "contains_dairy": "contains dairy",
-    "contains_fish": "contains fish",
-    "fast": "fast",
-    "cheap": "cheap",
-    "common_paris_ingredients": "common ingredients",
+    "vegetarian": "végétarien",
+    "no_meat": "sans viande",
+    "no_fish": "sans poisson",
+    "lactose_free": "sans lactose",
+    "dairy_free": "sans produits laitiers",
+    "contains_egg": "contient œuf",
+    "contains_dairy": "contient produits laitiers",
+    "contains_fish": "contient poisson",
+    "fast": "rapide",
+    "cheap": "économique",
+    "common_paris_ingredients": "ingrédients courants",
 }
 
 
@@ -29,13 +29,14 @@ def total_minutes(recipe: Recipe) -> int | None:
 
 def tag_text(tags: list[RecipeTag]) -> str:
     labels = [TAG_LABELS.get(tag.tag, tag.tag.replace("_", " ")) for tag in tags]
+
     preferred_order = [
-        "vegetarian",
-        "lactose-free",
-        "no meat",
-        "fast",
-        "cheap",
-        "common ingredients",
+        "végétarien",
+        "sans lactose",
+        "sans viande",
+        "rapide",
+        "économique",
+        "ingrédients courants",
     ]
 
     ordered: list[str] = []
@@ -47,7 +48,7 @@ def tag_text(tags: list[RecipeTag]) -> str:
         if item not in ordered:
             ordered.append(item)
 
-    return " · ".join(ordered[:5])
+    return " · ".join(ordered[:6])
 
 
 def format_quantity(value: object) -> str:
@@ -75,7 +76,7 @@ def ingredient_line(ingredient: RecipeIngredient, scale: float = 1.0) -> str:
 
     unit = ingredient.unit or ""
     name = escape(ingredient.name)
-    optional = " optional" if ingredient.optional else ""
+    optional = " facultatif" if ingredient.optional else ""
 
     prefix = " ".join(part for part in [quantity_text, unit] if part).strip()
 
@@ -87,23 +88,22 @@ def ingredient_line(ingredient: RecipeIngredient, scale: float = 1.0) -> str:
 
 def suggestion_text(recipe: Recipe, filter_label: str | None = None) -> str:
     minutes = total_minutes(recipe)
-    time_text = f"{minutes} min" if minutes else "time not set"
+    time_text = f"{minutes} min" if minutes else "temps non renseigné"
     tags = tag_text(recipe.tags)
 
-    filter_line = f"\nPreference: {escape(filter_label)}" if filter_label else ""
+    preference = escape(filter_label) if filter_label else "repas simple"
 
     return (
-        "Tonight's idea:\n\n"
         f"<b>{escape(recipe.title)}</b>\n\n"
-        f"{escape(tags)} · {escape(time_text)}"
-        f"{filter_line}\n\n"
-        f"{escape(recipe.short_description or 'A simple meal from your private catalogue.')}"
+        f"{escape(recipe.short_description or 'Une idée simple depuis ton catalogue privé.')}\n\n"
+        f"({escape(tags)} · {escape(time_text)})\n"
+        f"Préférence : {preference}"
     )
 
 
 def recipe_detail_text(recipe: Recipe) -> str:
     minutes = total_minutes(recipe)
-    time_text = f"{minutes} min" if minutes else "time not set"
+    time_text = f"{minutes} min" if minutes else "temps non renseigné"
     tags = tag_text(recipe.tags)
 
     ingredients = "\n".join(
@@ -113,19 +113,19 @@ def recipe_detail_text(recipe: Recipe) -> str:
 
     source = ""
     if recipe.source_name:
-        source += f"\n\nSource: {escape(recipe.source_name)}"
+        source += f"\n\nSource : {escape(recipe.source_name)}"
     if recipe.source_url:
         source += f"\n{escape(recipe.source_url)}"
 
     return (
         f"<b>{escape(recipe.title)}</b>\n\n"
-        f"Servings: {recipe.servings}\n"
-        f"Time: {escape(time_text)}\n"
-        f"Tags: {escape(tags)}\n\n"
-        f"<b>Ingredients</b>\n"
-        f"{ingredients or '- No ingredients recorded'}\n\n"
+        f"Portions : {recipe.servings}\n"
+        f"Temps : {escape(time_text)}\n"
+        f"Tags : {escape(tags)}\n\n"
+        f"<b>Ingrédients</b>\n"
+        f"{ingredients or '- Aucun ingrédient renseigné'}\n\n"
         f"<b>Notes</b>\n"
-        f"{escape(recipe.short_description or 'No notes yet.')}"
+        f"{escape(recipe.short_description or 'Pas encore de notes.')}"
         f"{source}"
     )
 
@@ -137,11 +137,11 @@ def shopping_list_text(recipe: Recipe, target_servings: int | None = None) -> st
 
     grouped: dict[str, list[RecipeIngredient]] = {}
     for ingredient in recipe.ingredients:
-        category = ingredient.category or "other"
+        category = ingredient.category or "autre"
         grouped.setdefault(category, []).append(ingredient)
 
     lines = [
-        f"<b>Shopping list for {servings} people</b>",
+        f"<b>Liste de courses pour {servings} personne{'s' if servings > 1 else ''}</b>",
         "",
         escape(recipe.title),
         "",

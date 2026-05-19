@@ -1,0 +1,58 @@
+id: green_lentil_carrot_egg_salad
+title: Salade de lentilles vertes, carottes et œuf
+short_description: Salade de lentilles complète, économique et rassasiante.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 25
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: lentilles vertes
+    quantity: 160
+    unit: g
+    category: épicerie
+    optional: false
+  - name: œufs
+    quantity: 2
+    unit: pièces
+    category: frais
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: échalote
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: moutarde
+    quantity: 1
+    unit: c. à café
+    category: placard
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: vinaigre
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: true
+notes: >-
+  Cuire les lentilles. Ajouter la carotte râpée ou cuite, les œufs durs et une
+  vinaigrette simple.
+concerns_or_tag_ambiguity: >-
+  Pas toujours fast avec des lentilles sèches. Peut devenir fast avec lentilles déjà cuites.

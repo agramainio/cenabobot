@@ -1,0 +1,61 @@
+id: coconut_red_lentil_dahl
+title: Dahl de lentilles corail au lait de coco
+short_description: Dahl doux, simple et pratique pour un soir de semaine.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: lentilles corail
+    quantity: 180
+    unit: g
+    category: épicerie
+    optional: false
+  - name: lait de coco
+    quantity: 200
+    unit: ml
+    category: épicerie
+    optional: false
+  - name: tomate concassée
+    quantity: 200
+    unit: g
+    category: épicerie
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: curry doux
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: false
+  - name: riz
+    quantity: 120
+    unit: g
+    category: épicerie
+    optional: false
+  - name: huile neutre
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Cuire le riz à part. Faire revenir l’oignon avec le curry, puis ajouter les
+  lentilles, la tomate, le lait de coco et un peu d’eau. Laisser cuire jusqu’à
+  ce que les lentilles soient fondantes.
+concerns_or_tag_ambiguity: >-
+  Le lait de coco n’est pas un produit laitier. Aucun souci pour dairy_free si aucun yaourt
+  ou beurre n’est ajouté.

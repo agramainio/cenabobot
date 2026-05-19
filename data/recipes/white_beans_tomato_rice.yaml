@@ -1,0 +1,53 @@
+id: white_beans_tomato_rice
+title: Haricots blancs à la tomate et riz
+short_description: Plat de placard très simple et bon marché.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: haricots blancs cuits
+    quantity: 400
+    unit: g
+    category: épicerie
+    optional: false
+  - name: tomate concassée
+    quantity: 300
+    unit: g
+    category: épicerie
+    optional: false
+  - name: riz
+    quantity: 120
+    unit: g
+    category: épicerie
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: ail
+    quantity: 1
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: herbes de Provence
+    quantity: 1
+    unit: c. à café
+    category: herbes
+    optional: true
+notes: >-
+  Faire mijoter les haricots et la tomate avec les herbes. Servir avec du riz.
+concerns_or_tag_ambiguity: >-
+  Aucun souci si aucun fromage ou produit laitier n’est ajouté.

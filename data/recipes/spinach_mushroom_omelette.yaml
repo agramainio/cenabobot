@@ -1,0 +1,54 @@
+id: spinach_mushroom_omelette
+title: Omelette épinards-champignons
+short_description: Omelette rapide avec légumes, très simple.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: œufs
+    quantity: 4
+    unit: pièces
+    category: frais
+    optional: false
+  - name: champignons de Paris
+    quantity: 200
+    unit: g
+    category: légumes
+    optional: false
+  - name: épinards
+    quantity: 150
+    unit: g
+    category: légumes
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: petit
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: salade verte
+    quantity: 1
+    unit: sachet
+    category: légumes
+    optional: true
+notes: >-
+  Faire revenir les champignons et les épinards. Ajouter les œufs battus et cuire
+  doucement. Servir avec une salade verte.
+concerns_or_tag_ambiguity: >-
+  Pas vegan. Ne contient pas de produit laitier si aucun lait, crème ou fromage n’est ajouté.

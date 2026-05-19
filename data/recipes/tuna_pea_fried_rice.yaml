@@ -1,0 +1,52 @@
+id: tuna_pea_fried_rice
+title: Riz sauté au thon et petits pois
+short_description: Riz de placard rapide avec thon et légumes.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - no_meat
+  - contains_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: riz
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: thon en boîte
+    quantity: 1
+    unit: boîte
+    category: poisson
+    optional: false
+  - name: petits pois
+    quantity: 150
+    unit: g
+    category: surgelé
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: sauce soja
+    quantity: 1
+    unit: c. à soupe
+    category: épicerie
+    optional: true
+  - name: huile neutre
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Cuire le riz. Faire sauter les petits pois et la carotte, puis ajouter le riz
+  et le thon.
+concerns_or_tag_ambiguity: >-
+  Pas vegetarian car contient du thon.

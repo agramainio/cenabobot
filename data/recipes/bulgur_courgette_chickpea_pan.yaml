@@ -1,0 +1,53 @@
+id: bulgur_courgette_chickpea_pan
+title: Poêlée boulgour, courgette et pois chiches
+short_description: Plat végétal simple avec céréale et légumineuse.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: boulgour
+    quantity: 150
+    unit: g
+    category: épicerie
+    optional: false
+  - name: pois chiches cuits
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: tomate
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Cuire le boulgour. Poêler les légumes et les pois chiches, puis mélanger le tout.
+concerns_or_tag_ambiguity: >-
+  Aucune ambiguïté particulière.

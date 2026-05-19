@@ -1,0 +1,51 @@
+id: tuna_potato_green_bean_salad
+title: Salade thon, pommes de terre, haricots verts
+short_description: Salade complète très classique, froide ou tiède.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - no_meat
+  - contains_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: thon en boîte
+    quantity: 1
+    unit: boîte
+    category: poisson
+    optional: false
+  - name: pommes de terre
+    quantity: 450
+    unit: g
+    category: légumes
+    optional: false
+  - name: haricots verts
+    quantity: 250
+    unit: g
+    category: légumes
+    optional: false
+  - name: tomate
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: œufs
+    quantity: 2
+    unit: pièces
+    category: frais
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Cuire les pommes de terre et les haricots verts. Ajouter le thon, la tomate et
+  l’huile d’olive. Ajouter des œufs durs si souhaité.
+concerns_or_tag_ambiguity: >-
+  Si les œufs sont utilisés, ajouter le tag contains_egg. Pas vegetarian car contient du thon.

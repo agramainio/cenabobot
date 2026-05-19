@@ -1,11 +1,11 @@
-id: lentil_spinach_soup
-title: Soupe de lentilles corail aux épinards
-short_description: Soupe rapide, nourrissante, sans produit laitier.
+id: couscous_chickpea_roasted_vegetables
+title: Semoule complète aux pois chiches et légumes rôtis
+short_description: Assiette végétale simple avec semoule, pois chiches et légumes.
 source_name: internal
 source_url: ""
 servings: 2
 prep_minutes: 10
-cook_minutes: 20
+cook_minutes: 30
 tags:
   - vegetarian
   - vegan
@@ -13,18 +13,22 @@ tags:
   - no_fish
   - lactose_free
   - dairy_free
-  - fast
   - cheap
   - common_paris_ingredients
 ingredients:
-  - name: lentilles corail
-    quantity: 160
+  - name: semoule complète
+    quantity: 150
     unit: g
     category: épicerie
     optional: false
-  - name: épinards
-    quantity: 200
+  - name: pois chiches cuits
+    quantity: 300
     unit: g
+    category: épicerie
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit: pièce
     category: légumes
     optional: false
   - name: carotte
@@ -37,11 +41,6 @@ ingredients:
     unit: pièce
     category: légumes
     optional: false
-  - name: ail
-    quantity: 1
-    unit: gousse
-    category: légumes
-    optional: true
   - name: cumin
     quantity: 1
     unit: c. à café
@@ -52,13 +51,8 @@ ingredients:
     unit: c. à soupe
     category: placard
     optional: false
-  - name: bouillon de légumes
-    quantity: 700
-    unit: ml
-    category: épicerie
-    optional: false
 notes: >-
-  Faire revenir l’oignon, la carotte et l’ail. Ajouter les lentilles, le bouillon
-  et le cumin. Cuire environ 20 minutes, puis ajouter les épinards en fin de cuisson.
+  Rôtir ou poêler les légumes. Réhydrater la semoule. Ajouter les pois chiches
+  et l’assaisonnement.
 concerns_or_tag_ambiguity: >-
-  Vérifier que le bouillon ne contient pas de lactose si le tag lactose_free doit être strict.
+  Pas forcément fast si les légumes sont rôtis au four.

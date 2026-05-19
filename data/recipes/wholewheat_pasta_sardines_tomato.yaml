@@ -1,0 +1,52 @@
+id: wholewheat_pasta_sardines_tomato
+title: Pâtes complètes aux sardines et tomates
+short_description: Pâtes économiques avec poisson en boîte et sauce tomate.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - no_meat
+  - contains_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pâtes complètes
+    quantity: 180
+    unit: g
+    category: épicerie
+    optional: false
+  - name: sardines en boîte
+    quantity: 1
+    unit: boîte
+    category: poisson
+    optional: false
+  - name: tomate concassée
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: ail
+    quantity: 1
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+  - name: persil
+    quantity: 1
+    unit: poignée
+    category: herbes
+    optional: true
+notes: >-
+  Préparer une sauce tomate rapide, ajouter les sardines émiettées, puis mélanger
+  avec les pâtes cuites.
+concerns_or_tag_ambiguity: >-
+  no_meat oui, mais pas vegetarian car cette recette contient du poisson.

@@ -1,0 +1,53 @@
+id: dairy_free_courgette_rice_bake
+title: Gratin express courgette-riz sans fromage
+short_description: Riz et courgettes au four, version simple sans lait ni fromage.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 30
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: riz
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: courgettes
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: tomate concassée
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: herbes de Provence
+    quantity: 1
+    unit: c. à café
+    category: herbes
+    optional: true
+notes: >-
+  Mélanger du riz précuit avec les courgettes poêlées et la tomate. Passer au four
+  15 à 20 minutes.
+concerns_or_tag_ambiguity: >-
+  Pas fast si on part de riz cru et d’une cuisson complète au four.

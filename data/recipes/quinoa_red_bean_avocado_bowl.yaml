@@ -1,0 +1,52 @@
+id: quinoa_red_bean_avocado_bowl
+title: Bol quinoa, haricots rouges et avocat
+short_description: Bol végétal simple et frais avec légumineuses.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: quinoa
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: haricots rouges cuits
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: avocat
+    quantity: 1
+    unit: pièce
+    category: fruits
+    optional: true
+  - name: tomate
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: maïs
+    quantity: 100
+    unit: g
+    category: épicerie
+    optional: true
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+notes: >-
+  Cuire le quinoa. Ajouter les haricots, la tomate, le maïs, l’avocat et le citron.
+concerns_or_tag_ambiguity: >-
+  L’avocat est courant, mais pas toujours cheap.

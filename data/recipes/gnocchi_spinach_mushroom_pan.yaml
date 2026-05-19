@@ -1,0 +1,44 @@
+id: gnocchi_spinach_mushroom_pan
+title: Poêlée de gnocchi, épinards et champignons
+short_description: Repas rapide avec gnocchi du commerce et légumes.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: gnocchi
+    quantity: 400
+    unit: g
+    category: frais
+    optional: false
+  - name: épinards
+    quantity: 150
+    unit: g
+    category: légumes
+    optional: false
+  - name: champignons
+    quantity: 200
+    unit: g
+    category: légumes
+    optional: false
+  - name: ail
+    quantity: 1
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Poêler les champignons, ajouter les gnocchi puis les épinards. Servir tel quel.
+concerns_or_tag_ambiguity: >-
+  Ne pas taguer lactose_free ou dairy_free sans vérifier la composition des gnocchi.

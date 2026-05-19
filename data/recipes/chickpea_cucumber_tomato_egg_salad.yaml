@@ -1,0 +1,64 @@
+id: chickpea_cucumber_tomato_egg_salad
+title: Salade pois chiches, concombre, tomate, œuf
+short_description: Salade complète froide ou tiède, facile à préparer.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 15
+cook_minutes: 10
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pois chiches cuits
+    quantity: 400
+    unit: g
+    category: épicerie
+    optional: false
+  - name: œufs
+    quantity: 2
+    unit: pièces
+    category: frais
+    optional: false
+  - name: concombre
+    quantity: 0.5
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: tomates
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: oignon rouge
+    quantity: 0.5
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: persil
+    quantity: 1
+    unit: poignée
+    category: herbes
+    optional: true
+notes: >-
+  Cuire les œufs durs. Mélanger les pois chiches avec les légumes, les œufs,
+  l’huile d’olive et le citron.
+concerns_or_tag_ambiguity: >-
+  Sans les œufs, cette recette pourrait devenir vegan. Avec œufs, garder contains_egg.

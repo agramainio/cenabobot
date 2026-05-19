@@ -1,0 +1,58 @@
+id: simple_minestrone_soup
+title: Soupe minestrone simplifiée
+short_description: Soupe de légumes, haricots et petites pâtes.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 25
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: haricots blancs cuits
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: petites pâtes sans œuf
+    quantity: 80
+    unit: g
+    category: épicerie
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: tomate concassée
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: bouillon de légumes
+    quantity: 700
+    unit: ml
+    category: épicerie
+    optional: false
+  - name: herbes de Provence
+    quantity: 1
+    unit: c. à café
+    category: herbes
+    optional: true
+notes: >-
+  Cuire les légumes dans le bouillon avec la tomate. Ajouter les pâtes et les haricots
+  en fin de cuisson.
+concerns_or_tag_ambiguity: >-
+  Pour garder vegan, utiliser des pâtes sans œuf.

@@ -115,7 +115,7 @@ async def show_menu(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            "What do you want?",
+            "Que veux-tu faire ?",
             reply_markup=main_menu_keyboard(),
         )
 
@@ -188,7 +188,7 @@ async def show_recipe(callback: CallbackQuery) -> None:
         recipe = await get_recipe(session, recipe_id)
 
     if recipe is None:
-        await callback.message.edit_text("Recipe not found.", reply_markup=main_menu_keyboard())
+        await callback.message.edit_text("Recette introuvable.", reply_markup=main_menu_keyboard())
         return
 
     await callback.message.edit_text(
@@ -218,7 +218,7 @@ async def show_shopping_list(callback: CallbackQuery) -> None:
         recipe = await get_recipe(session, recipe_id)
 
     if recipe is None:
-        await callback.message.edit_text("Recipe not found.", reply_markup=main_menu_keyboard())
+        await callback.message.edit_text("Recette introuvable.", reply_markup=main_menu_keyboard())
         return
 
     await callback.message.edit_text(
@@ -247,9 +247,9 @@ async def save(callback: CallbackQuery) -> None:
         )
 
     if created:
-        await callback.answer("Saved.", show_alert=False)
+        await callback.answer("Enregistré.", show_alert=False)
     else:
-        await callback.answer("Already saved.", show_alert=False)
+        await callback.answer("Déjà enregistré.", show_alert=False)
 
 
 @router.callback_query(F.data.startswith("reject:"))
@@ -257,7 +257,7 @@ async def reject(callback: CallbackQuery) -> None:
     if await reject_callback_if_unauthorized(callback):
         return
 
-    await callback.answer("Skipped.", show_alert=False)
+    await callback.answer("Passé.", show_alert=False)
 
     if not callback.data or not callback.message:
         return
@@ -296,12 +296,12 @@ async def favorites(callback: CallbackQuery) -> None:
 
     if not recipes:
         await callback.message.edit_text(
-            "No favorites yet.",
+            "Aucun favori pour l’instant.",
             reply_markup=main_menu_keyboard(),
         )
         return
 
-    lines = ["<b>Your favorites</b>", ""]
+    lines = ["<b>Tes favoris</b>", ""]
     for index, recipe in enumerate(recipes, start=1):
         lines.append(f"{index}. {recipe.title}")
 

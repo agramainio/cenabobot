@@ -1,0 +1,51 @@
+id: cod_tomato_pepper_rice
+title: Cabillaud tomate-poivron et riz
+short_description: Poisson mijoté dans une sauce tomate simple.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - no_meat
+  - contains_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: cabillaud ou colin
+    quantity: 2
+    unit: filets
+    category: poisson
+    optional: false
+  - name: riz
+    quantity: 120
+    unit: g
+    category: épicerie
+    optional: false
+  - name: tomate concassée
+    quantity: 300
+    unit: g
+    category: épicerie
+    optional: false
+  - name: poivron
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: herbes de Provence
+    quantity: 1
+    unit: c. à café
+    category: herbes
+    optional: true
+notes: >-
+  Préparer une sauce tomate-poivron, déposer le poisson dedans et cuire doucement.
+  Servir avec du riz.
+concerns_or_tag_ambiguity: >-
+  no_meat oui, mais pas vegetarian car cette recette contient du poisson.

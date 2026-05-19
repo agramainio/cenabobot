@@ -1,0 +1,54 @@
+id: noodle_egg_vegetable_soup
+title: Soupe nouilles, œuf et légumes
+short_description: Soupe rapide avec nouilles, œuf et légumes simples.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: nouilles
+    quantity: 120
+    unit: g
+    category: épicerie
+    optional: false
+  - name: œufs
+    quantity: 2
+    unit: pièces
+    category: frais
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: épinards
+    quantity: 100
+    unit: g
+    category: légumes
+    optional: false
+  - name: bouillon de légumes
+    quantity: 700
+    unit: ml
+    category: épicerie
+    optional: false
+  - name: sauce soja
+    quantity: 1
+    unit: c. à soupe
+    category: épicerie
+    optional: true
+notes: >-
+  Cuire la carotte et les nouilles dans le bouillon. Ajouter les épinards et les œufs
+  en fin de cuisson.
+concerns_or_tag_ambiguity: >-
+  Vérifier le bouillon et les nouilles si lactose_free doit être strict.

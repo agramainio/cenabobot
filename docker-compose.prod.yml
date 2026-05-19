@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:17
+    container_name: cenabobot_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - cenabobot_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  bot:
+    build: .
+    container_name: cenabobot_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    command: >
+      sh -c "
+      alembic upgrade head &&
+      python scripts/import_recipes.py &&
+      python -m app.main
+      "
+
+volumes:
+  cenabobot_pgdata:

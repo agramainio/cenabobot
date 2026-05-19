@@ -1,0 +1,58 @@
+id: wholewheat_pasta_egg_tomato_cucumber_salad
+title: Salade pâtes complètes, œuf, tomate, concombre
+short_description: Salade de pâtes simple avec œufs, pratique à l’avance.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 15
+cook_minutes: 12
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pâtes complètes
+    quantity: 160
+    unit: g
+    category: épicerie
+    optional: false
+  - name: œufs
+    quantity: 2
+    unit: pièces
+    category: frais
+    optional: false
+  - name: tomates
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: concombre
+    quantity: 0.5
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: maïs
+    quantity: 100
+    unit: g
+    category: épicerie
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: vinaigre
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: true
+notes: >-
+  Cuire les pâtes et les œufs. Mélanger avec les légumes et une vinaigrette simple.
+concerns_or_tag_ambiguity: >-
+  Pas vegan car contient des œufs.

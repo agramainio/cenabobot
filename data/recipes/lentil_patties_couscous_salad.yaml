@@ -1,0 +1,58 @@
+id: lentil_patties_couscous_salad
+title: Boulettes de lentilles express avec semoule et salade
+short_description: Galettes simples à base de lentilles cuites, servies avec semoule.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 15
+cook_minutes: 15
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: lentilles cuites
+    quantity: 400
+    unit: g
+    category: épicerie
+    optional: false
+  - name: flocons d’avoine
+    quantity: 50
+    unit: g
+    category: épicerie
+    optional: false
+  - name: oignon
+    quantity: 0.5
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: cumin
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: true
+  - name: semoule
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: salade verte
+    quantity: 1
+    unit: sachet
+    category: légumes
+    optional: false
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Écraser les lentilles avec les flocons d’avoine et l’oignon. Former de petites
+  galettes, les poêler, puis servir avec semoule et salade.
+concerns_or_tag_ambiguity: >-
+  Pas fast si on part de lentilles sèches. Fast seulement avec des lentilles déjà cuites.

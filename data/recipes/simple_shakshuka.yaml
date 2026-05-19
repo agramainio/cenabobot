@@ -1,0 +1,54 @@
+id: simple_shakshuka
+title: Shakshuka simple aux œufs
+short_description: Œufs cuits dans une sauce tomate-poivron.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: œufs
+    quantity: 4
+    unit: pièces
+    category: frais
+    optional: false
+  - name: tomate concassée
+    quantity: 400
+    unit: g
+    category: épicerie
+    optional: false
+  - name: poivron
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: paprika
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: true
+  - name: pain complet
+    quantity: 2
+    unit: tranches
+    category: épicerie
+    optional: true
+notes: >-
+  Cuire l’oignon et le poivron, ajouter la tomate et le paprika. Casser les œufs
+  dans la sauce et couvrir jusqu’à cuisson.
+concerns_or_tag_ambiguity: >-
+  Vérifier le pain si lactose_free doit être strict.

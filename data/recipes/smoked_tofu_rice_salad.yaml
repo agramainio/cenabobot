@@ -1,0 +1,57 @@
+id: smoked_tofu_rice_salad
+title: Salade de riz, tofu fumé et crudités
+short_description: Salade froide simple, pratique en avance.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 15
+cook_minutes: 15
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: riz
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: tofu fumé
+    quantity: 200
+    unit: g
+    category: protéines
+    optional: false
+  - name: concombre
+    quantity: 0.5
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: tomates
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: vinaigre
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: true
+notes: >-
+  Cuire le riz, le refroidir rapidement, puis ajouter le tofu en dés et les crudités.
+concerns_or_tag_ambiguity: >-
+  Le tofu fumé est courant mais un peu plus spécifique que le tofu nature.

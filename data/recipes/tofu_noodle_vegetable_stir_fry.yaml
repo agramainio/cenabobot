@@ -1,0 +1,54 @@
+id: tofu_noodle_vegetable_stir_fry
+title: Poêlée tofu, nouilles et légumes
+short_description: Nouilles sautées avec tofu et légumes courants.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: tofu ferme
+    quantity: 200
+    unit: g
+    category: protéines
+    optional: false
+  - name: nouilles de blé ou de riz
+    quantity: 160
+    unit: g
+    category: épicerie
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: sauce soja
+    quantity: 1
+    unit: c. à soupe
+    category: épicerie
+    optional: true
+  - name: huile neutre
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Cuire les nouilles. Poêler le tofu en cubes et les légumes, puis ajouter les
+  nouilles et la sauce soja.
+concerns_or_tag_ambiguity: >-
+  Le tofu est courant en supermarché parisien, mais un peu moins classique que les œufs
+  ou les lentilles.

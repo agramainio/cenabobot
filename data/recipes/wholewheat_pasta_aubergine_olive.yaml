@@ -1,0 +1,59 @@
+id: wholewheat_pasta_aubergine_olive
+title: Pâtes complètes tomate-aubergine-olives
+short_description: Pâtes simples aux légumes, sans fromage obligatoire.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pâtes complètes
+    quantity: 180
+    unit: g
+    category: épicerie
+    optional: false
+  - name: aubergine
+    quantity: 1
+    unit: petite pièce
+    category: légumes
+    optional: false
+  - name: tomate concassée
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: olives noires
+    quantity: 40
+    unit: g
+    category: épicerie
+    optional: true
+  - name: ail
+    quantity: 1
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: basilic ou herbes de Provence
+    quantity: 1
+    unit: c. à café
+    category: herbes
+    optional: true
+notes: >-
+  Faire revenir l’aubergine en dés avec l’huile et l’ail. Ajouter la tomate et les
+  herbes. Mélanger avec les pâtes cuites.
+concerns_or_tag_ambiguity: >-
+  Ne pas ajouter de parmesan si les tags dairy_free et lactose_free doivent rester vrais.

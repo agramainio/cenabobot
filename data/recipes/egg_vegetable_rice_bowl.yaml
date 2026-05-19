@@ -1,0 +1,59 @@
+id: egg_vegetable_rice_bowl
+title: Riz aux œufs et légumes sautés
+short_description: Bol de riz complet avec œufs et légumes, façon repas rapide.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: riz
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: œufs
+    quantity: 3
+    unit: pièces
+    category: frais
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: petits pois surgelés
+    quantity: 100
+    unit: g
+    category: surgelé
+    optional: true
+  - name: sauce soja
+    quantity: 1
+    unit: c. à soupe
+    category: épicerie
+    optional: true
+  - name: huile neutre
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Cuire le riz. Sauter les légumes, ajouter les œufs battus, puis incorporer
+  le riz. Assaisonner simplement avec un peu de sauce soja si souhaité.
+concerns_or_tag_ambiguity: >-
+  Vegetarian oui, car les œufs sont autorisés. Ne pas taguer vegan.

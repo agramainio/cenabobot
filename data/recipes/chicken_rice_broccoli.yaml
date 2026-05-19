@@ -1,0 +1,49 @@
+id: chicken_rice_broccoli
+title: Poulet, riz et brocoli
+short_description: Repas très direct avec protéine, féculent et légume.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: blanc de poulet
+    quantity: 250
+    unit: g
+    category: viande
+    optional: false
+  - name: riz
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: brocoli
+    quantity: 300
+    unit: g
+    category: légumes
+    optional: false
+  - name: ail
+    quantity: 1
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: paprika
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: true
+notes: >-
+  Cuire le riz. Cuire le brocoli à la vapeur ou à l’eau. Poêler le poulet avec
+  ail et paprika.
+concerns_or_tag_ambiguity: >-
+  Contient de la viande, donc ne pas utiliser no_meat.

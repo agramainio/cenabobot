@@ -1,0 +1,53 @@
+id: scrambled_eggs_quick_ratatouille
+title: Œufs brouillés, ratatouille rapide et pain complet
+short_description: Œufs avec légumes mijotés simples.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - contains_egg
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: œufs
+    quantity: 4
+    unit: pièces
+    category: frais
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: aubergine
+    quantity: 1
+    unit: petite pièce
+    category: légumes
+    optional: true
+  - name: tomate concassée
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+  - name: pain complet
+    quantity: 2
+    unit: tranches
+    category: épicerie
+    optional: true
+notes: >-
+  Faire une ratatouille rapide à la poêle. Servir avec des œufs brouillés préparés
+  sans lait.
+concerns_or_tag_ambiguity: >-
+  Vérifier le pain si lactose_free doit être strict.

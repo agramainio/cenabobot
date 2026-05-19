@@ -1,0 +1,54 @@
+id: wholewheat_pasta_broccoli_chickpeas
+title: Pâtes complètes aux brocolis et pois chiches
+short_description: Pâtes végétales simples, plus nourrissantes grâce aux pois chiches.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pâtes complètes
+    quantity: 180
+    unit: g
+    category: épicerie
+    optional: false
+  - name: brocoli
+    quantity: 300
+    unit: g
+    category: légumes
+    optional: false
+  - name: pois chiches cuits
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: ail
+    quantity: 1
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+notes: >-
+  Cuire les pâtes et le brocoli. Mélanger avec les pois chiches, l’ail légèrement
+  revenu, l’huile d’olive et le citron.
+concerns_or_tag_ambiguity: >-
+  Ne pas ajouter de fromage si dairy_free doit rester vrai.

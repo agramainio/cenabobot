@@ -1,0 +1,53 @@
+id: hummus_raw_vegetable_wraps
+title: Wraps houmous-crudités
+short_description: Repas très rapide, sans cuisson, pratique pour un soir léger.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 15
+cook_minutes: 0
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: tortillas de blé
+    quantity: 4
+    unit: pièces
+    category: épicerie
+    optional: false
+  - name: houmous
+    quantity: 150
+    unit: g
+    category: frais
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: concombre
+    quantity: 0.5
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: salade
+    quantity: 1
+    unit: poignée
+    category: légumes
+    optional: false
+  - name: tomate
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: true
+notes: >-
+  Tartiner les tortillas de houmous, ajouter les crudités, rouler et servir.
+concerns_or_tag_ambiguity: >-
+  Vérifier les tortillas et le houmous industriel si lactose_free doit être strict.

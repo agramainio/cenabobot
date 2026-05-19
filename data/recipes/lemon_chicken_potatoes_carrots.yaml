@@ -1,0 +1,48 @@
+id: lemon_chicken_potatoes_carrots
+title: Poulet citron, pommes de terre et carottes
+short_description: Plat simple au four ou à la poêle, sans sauce lourde.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 35
+tags:
+  - lactose_free
+  - dairy_free
+  - common_paris_ingredients
+ingredients:
+  - name: poulet
+    quantity: 300
+    unit: g
+    category: viande
+    optional: false
+  - name: pommes de terre
+    quantity: 450
+    unit: g
+    category: légumes
+    optional: false
+  - name: carottes
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: thym
+    quantity: 1
+    unit: c. à café
+    category: herbes
+    optional: true
+notes: >-
+  Cuire le poulet, les pommes de terre et les carottes ensemble au four ou à la poêle
+  avec citron et thym.
+concerns_or_tag_ambiguity: >-
+  Pas fast si la cuisson se fait entièrement au four.

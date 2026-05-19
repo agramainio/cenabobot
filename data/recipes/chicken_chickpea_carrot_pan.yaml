@@ -1,0 +1,49 @@
+id: chicken_chickpea_carrot_pan
+title: Poulet aux pois chiches et carottes
+short_description: Poêlée simple, nourrissante, sans crème.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: blanc de poulet
+    quantity: 220
+    unit: g
+    category: viande
+    optional: false
+  - name: pois chiches cuits
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: carottes
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: cumin
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Faire revenir l’oignon, les carottes et le poulet. Ajouter les pois chiches
+  et le cumin, puis cuire jusqu’à ce que tout soit tendre.
+concerns_or_tag_ambiguity: >-
+  Contient de la viande, donc ne pas utiliser no_meat.

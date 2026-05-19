@@ -1,0 +1,60 @@
+id: chickpea_carrot_curry
+title: Curry de pois chiches aux carottes
+short_description: Curry végétal très simple avec des ingrédients de placard.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pois chiches cuits
+    quantity: 400
+    unit: g
+    category: épicerie
+    optional: false
+  - name: carottes
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: tomate concassée
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: curry
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: false
+  - name: riz
+    quantity: 120
+    unit: g
+    category: épicerie
+    optional: false
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+notes: >-
+  Faire revenir l’oignon et les carottes. Ajouter le curry, la tomate et les pois
+  chiches. Laisser mijoter environ 20 minutes. Servir avec du riz.
+concerns_or_tag_ambiguity: >-
+  Ne pas ajouter de yaourt, crème ou fromage si les tags dairy_free et lactose_free
+  doivent rester vrais.

@@ -1,0 +1,54 @@
+id: express_chickpea_vegetable_couscous
+title: Couscous express légumes-pois chiches
+short_description: Version très simple et végétale du couscous de semaine.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - vegan
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: semoule
+    quantity: 150
+    unit: g
+    category: épicerie
+    optional: false
+  - name: pois chiches cuits
+    quantity: 300
+    unit: g
+    category: épicerie
+    optional: false
+  - name: carottes
+    quantity: 2
+    unit: pièces
+    category: légumes
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit: pièce
+    category: légumes
+    optional: false
+  - name: tomate concassée
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: ras el hanout
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: true
+notes: >-
+  Cuire les légumes dans la tomate avec les épices. Ajouter les pois chiches.
+  Servir avec la semoule réhydratée.
+concerns_or_tag_ambiguity: >-
+  L’épice est optionnelle pour éviter de rendre la recette trop spécifique.

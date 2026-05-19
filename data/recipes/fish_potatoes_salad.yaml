@@ -1,0 +1,51 @@
+id: fish_potatoes_salad
+title: Filet de poisson, pommes de terre et salade
+short_description: Repas classique, simple et équilibré sans complication.
+source_name: internal
+source_url: ""
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - no_meat
+  - contains_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - common_paris_ingredients
+ingredients:
+  - name: filets de colin ou cabillaud
+    quantity: 2
+    unit: pièces
+    category: poisson
+    optional: false
+  - name: pommes de terre
+    quantity: 500
+    unit: g
+    category: légumes
+    optional: false
+  - name: salade verte
+    quantity: 1
+    unit: sachet
+    category: légumes
+    optional: false
+  - name: citron
+    quantity: 0.5
+    unit: pièce
+    category: fruits
+    optional: true
+  - name: huile d’olive
+    quantity: 1
+    unit: c. à soupe
+    category: placard
+    optional: false
+  - name: persil
+    quantity: 1
+    unit: poignée
+    category: herbes
+    optional: true
+notes: >-
+  Cuire les pommes de terre à l’eau. Poêler le poisson doucement avec un peu d’huile
+  et de citron. Servir avec la salade.
+concerns_or_tag_ambiguity: >-
+  no_meat oui, mais pas vegetarian car cette recette contient du poisson.

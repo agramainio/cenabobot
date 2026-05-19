@@ -1,0 +1,44 @@
+id: omelette_mushroom_salad
+title: Omelette champignons-salade
+short_description: Very simple vegetarian dinner with eggs, mushrooms, and salad.
+source_name: internal seed
+source_url:
+servings: 2
+prep_minutes: 10
+cook_minutes: 10
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - contains_egg
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: œufs
+    quantity: 4
+    unit:
+    category: frais
+    optional: false
+  - name: champignons de Paris
+    quantity: 250
+    unit: g
+    category: légumes
+    optional: false
+  - name: salade
+    quantity: 1
+    unit:
+    category: légumes
+    optional: false
+  - name: pain complet
+    quantity:
+    unit:
+    category: épicerie
+    optional: true
+  - name: huile d'olive
+    quantity:
+    unit:
+    category: placard
+    optional: false

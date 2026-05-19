@@ -1,0 +1,48 @@
+id: chickpea_spinach_curry
+title: Curry pois chiches-épinards au lait de coco
+short_description: A simple chickpea and spinach curry, lactose-free and easy with pantry ingredients.
+source_name: internal seed
+source_url:
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: pois chiches cuits
+    quantity: 250
+    unit: g
+    category: épicerie
+    optional: false
+  - name: épinards
+    quantity: 200
+    unit: g
+    category: légumes
+    optional: false
+  - name: lait de coco
+    quantity: 200
+    unit: ml
+    category: épicerie
+    optional: false
+  - name: riz
+    quantity: 140
+    unit: g
+    category: épicerie
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit:
+    category: légumes
+    optional: false
+  - name: curry
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: false

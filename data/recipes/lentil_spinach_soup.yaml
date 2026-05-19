@@ -1,0 +1,48 @@
+id: lentil_spinach_soup
+title: Soupe de lentilles corail aux épinards
+short_description: Simple lentil and spinach soup for a quick, filling weekday dinner.
+source_name: internal seed
+source_url:
+servings: 2
+prep_minutes: 10
+cook_minutes: 20
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: lentilles corail
+    quantity: 160
+    unit: g
+    category: épicerie
+    optional: false
+  - name: épinards
+    quantity: 200
+    unit: g
+    category: légumes
+    optional: false
+  - name: oignon
+    quantity: 1
+    unit:
+    category: légumes
+    optional: false
+  - name: ail
+    quantity: 1
+    unit: gousse
+    category: légumes
+    optional: true
+  - name: curry
+    quantity: 1
+    unit: c. à café
+    category: épices
+    optional: false
+  - name: huile d'olive
+    quantity:
+    unit:
+    category: placard
+    optional: false

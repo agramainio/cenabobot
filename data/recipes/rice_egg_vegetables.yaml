@@ -1,0 +1,49 @@
+id: rice_egg_vegetables
+title: Riz sauté aux légumes et œuf
+short_description: Fast rice, egg, and vegetable meal for when you want something simple and warm.
+source_name: internal seed
+source_url:
+servings: 2
+prep_minutes: 10
+cook_minutes: 15
+tags:
+  - vegetarian
+  - no_meat
+  - no_fish
+  - lactose_free
+  - dairy_free
+  - contains_egg
+  - fast
+  - cheap
+  - common_paris_ingredients
+ingredients:
+  - name: riz cuit ou riz à cuire
+    quantity: 160
+    unit: g
+    category: épicerie
+    optional: false
+  - name: œufs
+    quantity: 2
+    unit:
+    category: frais
+    optional: false
+  - name: carotte
+    quantity: 1
+    unit:
+    category: légumes
+    optional: false
+  - name: courgette
+    quantity: 1
+    unit:
+    category: légumes
+    optional: true
+  - name: sauce soja
+    quantity:
+    unit:
+    category: placard
+    optional: true
+  - name: huile
+    quantity:
+    unit:
+    category: placard
+    optional: false

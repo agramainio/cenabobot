@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +9,8 @@ from sqlalchemy.orm import selectinload
 
 from app.db.models import (
     Favorite,
+    MealProposal,
+    MealVote,
     Recipe,
     RecipeFeedback,
     RecipeIngredient,
@@ -25,11 +29,11 @@ FILTER_TAGS = {
 }
 
 FILTER_LABELS = {
-    "any": "any healthy meal",
-    "vegetarian": "vegetarian",
-    "no_lactose": "no lactose",
-    "no_meat": "no meat",
-    "fast": "fast",
+    "any": "repas simple",
+    "vegetarian": "végétarien",
+    "no_lactose": "sans lactose",
+    "no_meat": "sans viande",
+    "fast": "rapide",
 }
 
 
@@ -122,6 +126,131 @@ async def get_one_suggestion(
     await session.commit()
 
     return await get_recipe(session, recipe.id)
+
+
+async def create_meal_proposal(
+    session: AsyncSession,
+    *,
+    chat_id: int,
+    message_id: int | None,
+    recipe_id: str,
+    filter_key: str,
+    created_by_user_id: int | None,
+) -> MealProposal:
+    proposal = MealProposal(
+        chat_id=chat_id,
+        message_id=message_id,
+        recipe_id=recipe_id,
+        filter_key=filter_key,
+        status="open",
+        created_by_user_id=created_by_user_id,
+    )
+    session.add(proposal)
+    await session.commit()
+    await session.refresh(proposal)
+    return proposal
+
+
+async def set_meal_proposal_message_id(
+    session: AsyncSession,
+    *,
+    proposal_id: int,
+    message_id: int,
+) -> None:
+    proposal = await session.get(MealProposal, proposal_id)
+    if proposal is None:
+        return
+
+    proposal.message_id = message_id
+    await session.commit()
+
+
+async def get_meal_proposal_details(
+    session: AsyncSession,
+    proposal_id: int,
+) -> tuple[MealProposal | None, Recipe | None, list[MealVote]]:
+    proposal = await session.get(MealProposal, proposal_id)
+    if proposal is None:
+        return None, None, []
+
+    recipe = await get_recipe(session, proposal.recipe_id)
+
+    result = await session.execute(
+        select(MealVote)
+        .where(MealVote.proposal_id == proposal_id)
+        .order_by(MealVote.updated_at.asc())
+    )
+    votes = list(result.scalars().all())
+
+    return proposal, recipe, votes
+
+
+async def set_meal_vote(
+    session: AsyncSession,
+    *,
+    proposal_id: int,
+    user_id: int,
+    user_name: str | None,
+    vote: str,
+) -> tuple[MealProposal | None, Recipe | None, list[MealVote]]:
+    proposal = await session.get(MealProposal, proposal_id)
+    if proposal is None:
+        return None, None, []
+
+    result = await session.execute(
+        select(MealVote)
+        .where(MealVote.proposal_id == proposal_id)
+        .where(MealVote.user_id == user_id)
+    )
+    existing_vote = result.scalar_one_or_none()
+
+    if existing_vote is None:
+        session.add(
+            MealVote(
+                proposal_id=proposal_id,
+                user_id=user_id,
+                user_name=user_name,
+                vote=vote,
+                updated_at=datetime.now(UTC),
+            )
+        )
+    else:
+        existing_vote.vote = vote
+        existing_vote.user_name = user_name
+        existing_vote.updated_at = datetime.now(UTC)
+
+    await session.flush()
+
+    ok_result = await session.execute(
+        select(func.count())
+        .select_from(MealVote)
+        .where(MealVote.proposal_id == proposal_id)
+        .where(MealVote.vote == "ok")
+    )
+    ok_count = int(ok_result.scalar_one())
+
+    if proposal.status == "open" and ok_count >= 2:
+        proposal.status = "accepted"
+        proposal.accepted_at = datetime.now(UTC)
+
+    await session.commit()
+
+    return await get_meal_proposal_details(session, proposal_id)
+
+
+async def mark_meal_proposal_done(
+    session: AsyncSession,
+    *,
+    proposal_id: int,
+) -> tuple[MealProposal | None, Recipe | None, list[MealVote]]:
+    proposal = await session.get(MealProposal, proposal_id)
+    if proposal is None:
+        return None, None, []
+
+    proposal.status = "done"
+    await session.commit()
+
+    return await get_meal_proposal_details(session, proposal_id)
 
 
 async def save_favorite(

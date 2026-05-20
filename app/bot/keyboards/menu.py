@@ -20,9 +20,24 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
     )
 
 
-def suggestion_keyboard(recipe_id: str, filter_key: str, servings: int = 2) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
+def suggestion_keyboard(
+    recipe_id: str,
+    filter_key: str,
+    servings: int = 2,
+    proposal_id: int | None = None,
+) -> InlineKeyboardMarkup:
+    rows: list[list[InlineKeyboardButton]] = []
+
+    if proposal_id is not None:
+        rows.append(
+            [
+                InlineKeyboardButton(text="Ça me va", callback_data=f"vote:ok:{proposal_id}"),
+                InlineKeyboardButton(text="Pas ce soir", callback_data=f"vote:no:{proposal_id}"),
+            ]
+        )
+
+    rows.extend(
+        [
             [
                 InlineKeyboardButton(text="Voir la recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
                 InlineKeyboardButton(text="Liste de courses", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}"),
@@ -31,7 +46,29 @@ def suggestion_keyboard(recipe_id: str, filter_key: str, servings: int = 2) -> I
                 InlineKeyboardButton(text="Idée suivante", callback_data=f"next:{filter_key}"),
                 InlineKeyboardButton(text="Enregistrer", callback_data=f"save:{recipe_id}"),
             ],
-            [InlineKeyboardButton(text="Pas ça", callback_data=f"reject:{filter_key}:{recipe_id}")],
+        ]
+    )
+
+    if proposal_id is None:
+        rows.append([InlineKeyboardButton(text="Pas ça", callback_data=f"reject:{filter_key}:{recipe_id}")])
+
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def accepted_meal_keyboard(
+    proposal_id: int,
+    recipe_id: str,
+    filter_key: str,
+    servings: int = 2,
+) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Voir la recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
+                InlineKeyboardButton(text="Liste finale", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}"),
+            ],
+            [InlineKeyboardButton(text="Marquer comme fait", callback_data=f"done:{proposal_id}")],
+            [InlineKeyboardButton(text="Idée suivante", callback_data=f"next:{filter_key}")],
         ]
     )
 

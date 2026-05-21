@@ -53,6 +53,10 @@ from app.services.recipes import (
 
 router = Router()
 
+# In-memory state for the button-first import flow.
+# If the bot restarts between prompt and reply, the user simply taps the import button again.
+PENDING_IMPORT_INPUTS: dict[tuple[int, int], str] = {}
+
 
 
 def _draft_preview_text(draft) -> str:
@@ -117,6 +121,42 @@ def _message_author_name(message: Message) -> str:
 
 def _looks_like_url(value: str) -> bool:
     return value.startswith("http://") or value.startswith("https://")
+
+
+def _import_input_key_from_message(message: Message) -> tuple[int, int] | None:
+    if not message.from_user:
+        return None
+
+    return (message.chat.id, message.from_user.id)
+
+
+def _import_input_key_from_callback(callback: CallbackQuery) -> tuple[int, int] | None:
+    if not callback.message or not callback.from_user:
+        return None
+
+    return (callback.message.chat.id, callback.from_user.id)
+
+
+def _set_pending_import_input(callback: CallbackQuery, source_type: str) -> None:
+    key = _import_input_key_from_callback(callback)
+    if key is not None:
+        PENDING_IMPORT_INPUTS[key] = source_type
+
+
+def _pop_pending_import_input(message: Message) -> str | None:
+    key = _import_input_key_from_message(message)
+    if key is None:
+        return None
+
+    return PENDING_IMPORT_INPUTS.pop(key, None)
+
+
+def _get_pending_import_input(message: Message) -> str | None:
+    key = _import_input_key_from_message(message)
+    if key is None:
+        return None
+
+    return PENDING_IMPORT_INPUTS.get(key)
 
 
 
@@ -370,14 +410,21 @@ async def import_from_url_skeleton(callback: CallbackQuery) -> None:
         return
 
     await _ensure_actor_from_callback(callback)
+    _set_pending_import_input(callback, "url")
     await callback.answer()
 
     if callback.message:
         await callback.message.edit_text(
-            "🔗 <b>Import depuis un lien</b>\n\n"
-            "Envoie le lien avec :\n"
-            "<code>/import https://example.com/recette</code>\n\n"
-            "Le bot lira la page, préparera un brouillon, puis demandera une approbation.",
+            "🔗 <b>Import depuis un lien</b>
+
+"
+            "Colle maintenant le lien de la recette dans le chat.
+
+"
+            "Le bot lira la page, préparera un brouillon structuré, puis demandera une approbation.
+
+"
+            "Rien n’est ajouté au catalogue sans validation.",
             reply_markup=import_menu_keyboard(),
         )
 
@@ -391,14 +438,22 @@ async def import_from_text_skeleton(callback: CallbackQuery) -> None:
         return
 
     await _ensure_actor_from_callback(callback)
+    _set_pending_import_input(callback, "text")
     await callback.answer()
 
     if callback.message:
         await callback.message.edit_text(
-            "📋 <b>Import depuis un texte</b>\n\n"
-            "Envoie la recette avec :\n"
-            "<code>/import titre, ingrédients, préparation...</code>\n\n"
-            "Le bot préparera un brouillon structuré, puis demandera une approbation.",
+            "📋 <b>Import depuis un texte</b>
+
+"
+            "Colle maintenant la recette dans le chat.
+
+"
+            "Tu peux envoyer un texte simple avec titre, portions, temps, ingrédients et préparation. "
+            "Le bot préparera un brouillon structuré, puis demandera une approbation.
+
+"
+            "Rien n’est ajouté au catalogue sans validation.",
             reply_markup=import_menu_keyboard(),
         )
 
@@ -983,6 +1038,45 @@ async def favorites(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
         "\n".join(lines),
         reply_markup=favorites_keyboard([recipe.id for recipe in recipes]),
+    )
+
+
+@router.message(lambda message: bool(message.text) and _get_pending_import_input(message) is not None)
+async def receive_import_input(message: Message) -> None:
+    if await reject_message_if_unauthorized(message):
+        return
+
+    if await reject_message_if_untrusted_user(message):
+        return
+
+    await _ensure_actor_from_message(message)
+
+    raw_value = (message.text or "").strip()
+    source_type = _get_pending_import_input(message)
+
+    if source_type == "url" and not _looks_like_url(raw_value):
+        await message.answer(
+            "J’attends un lien qui commence par <code>http://</code> ou <code>https://</code>.\n\n"
+            "Colle le lien de la recette, ou reviens au menu.",
+            reply_markup=import_menu_keyboard(),
+        )
+        return
+
+    source_type = _pop_pending_import_input(message) or "text"
+
+    async with AsyncSessionLocal() as session:
+        draft = await create_recipe_import_draft(
+            session,
+            source_type=source_type,
+            source_url=raw_value if source_type == "url" else None,
+            raw_text=raw_value if source_type == "text" else None,
+            submitted_by_user_id=message.from_user.id,
+            submitted_by_name=_message_author_name(message),
+        )
+
+    await message.answer(
+        _draft_preview_text(draft),
+        reply_markup=import_draft_keyboard(draft.id),
     )
 
 

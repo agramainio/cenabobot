@@ -153,6 +153,7 @@ def import_draft_keyboard(draft_id: int) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(text="✅ Approuver", callback_data=f"import:approve:{draft_id}"),
                 InlineKeyboardButton(text="🗑️ Refuser", callback_data=f"import:reject:{draft_id}"),
             ],
+            [InlineKeyboardButton(text="👀 Voir YAML", callback_data=f"import:yaml:{draft_id}")],
             [InlineKeyboardButton(text="📚 Recettes en attente", callback_data="import:pending")],
             [InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")],
         ]

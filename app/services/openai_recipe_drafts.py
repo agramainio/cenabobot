@@ -126,6 +126,16 @@ RECIPE_DRAFT_SCHEMA: dict[str, Any] = {
 }
 
 
+
+def _output_language_name() -> str:
+    language = settings.APP_LANGUAGE.lower().strip()
+
+    if language == "it":
+        return "italien"
+
+    return "français"
+
+
 SYSTEM_PROMPT = """
 Tu transformes une recette fournie par un utilisateur autorisé en brouillon structuré pour cenabobot.
 
@@ -139,7 +149,7 @@ Règles produit :
   Exemples de métadonnées à exclure des ingrédients : "2 personnes", "25 min", "30 minutes".
 - Les ingrédients doivent contenir seulement de vrais ingrédients.
 - Les instructions/préparation doivent aller dans notes et short_description.
-- La sortie doit être en français.
+- La sortie doit respecter la langue demandée dans le message utilisateur système.
 - Les tags doivent respecter exactement l'enum du schéma.
 - no_meat signifie pas de viande, mais peut contenir poisson/œufs/lait.
 - vegetarian exclut viande et poisson, mais peut contenir œufs/lait.
@@ -163,7 +173,10 @@ async def generate_recipe_draft_data(raw_text: str, source_url: str | None = Non
             input=[
                 {
                     "role": "system",
-                    "content": SYSTEM_PROMPT.strip(),
+                    "content": (
+                        SYSTEM_PROMPT.strip()
+                        + f"\n\nLangue de sortie obligatoire : {_output_language_name()}."
+                    ),
                 },
                 {
                     "role": "user",

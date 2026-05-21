@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str = ""
     DATABASE_URL: str
     APP_ENV: str = "development"
+    APP_LANGUAGE: str = "fr"
 
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"

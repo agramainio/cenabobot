@@ -3,12 +3,15 @@ from __future__ import annotations
 from html import escape
 
 from aiogram import F, Router
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.types import CallbackQuery, Message
 
 from app.bot.keyboards.menu import (
     accepted_meal_keyboard,
     favorites_keyboard,
+    import_draft_keyboard,
+    import_drafts_keyboard,
+    import_menu_keyboard,
     main_menu_keyboard,
     recipe_keyboard,
     shopping_keyboard,
@@ -20,9 +23,19 @@ from app.services.auth import (
     identity_text,
     is_authorized,
     reject_callback_if_unauthorized,
+    reject_callback_if_untrusted_user,
     reject_message_if_unauthorized,
+    reject_message_if_untrusted_user,
 )
 from app.services.formatting import recipe_detail_text, shopping_list_text, suggestion_text
+from app.services.recipe_imports import (
+    create_recipe_import_draft,
+    draft_display_title,
+    get_recipe_import_draft,
+    list_pending_recipe_import_drafts,
+    reject_recipe_import_draft,
+    try_approve_recipe_import_draft_skeleton,
+)
 from app.services.recipes import (
     FILTER_LABELS,
     create_meal_proposal,
@@ -39,6 +52,63 @@ from app.services.recipes import (
 )
 
 router = Router()
+
+
+
+def _draft_preview_text(draft) -> str:
+    source_label = "lien" if draft.source_type == "url" else "texte"
+    title = escape(draft.proposed_title or "Brouillon à structurer")
+
+    lines = [
+        f"📝 <b>{title}</b>",
+        "",
+        f"Source : {escape(source_label)}",
+        f"Statut : {escape(draft.status)}",
+    ]
+
+    if draft.submitted_by_name:
+        lines.append(f"Proposé par : {escape(draft.submitted_by_name)}")
+
+    if draft.source_url:
+        lines.extend(["", f"Lien : {escape(draft.source_url)}"])
+
+    if draft.raw_text:
+        excerpt = " ".join(draft.raw_text.split())
+        if len(excerpt) > 500:
+            excerpt = excerpt[:500].rstrip() + "…"
+        lines.extend(["", "<b>Texte reçu</b>", escape(excerpt)])
+
+    if draft.proposed_yaml:
+        lines.extend(["", "✅ YAML proposé disponible."])
+    else:
+        lines.extend(["", "⚠️ YAML non généré pour l’instant."])
+
+    if draft.warnings:
+        lines.extend(["", "<b>À vérifier</b>", escape(draft.warnings)])
+
+    if draft.validation_errors:
+        lines.extend(["", "<b>Erreurs de validation</b>", escape(draft.validation_errors)])
+
+    return "\n".join(lines)
+
+
+def _message_author_name(message: Message) -> str:
+    user = message.from_user
+    if not user:
+        return "Utilisateur"
+
+    if user.first_name:
+        return user.first_name
+
+    if user.username:
+        return f"@{user.username}"
+
+    return str(user.id)
+
+
+def _looks_like_url(value: str) -> bool:
+    return value.startswith("http://") or value.startswith("https://")
+
 
 
 def _is_group_chat(message: Message) -> bool:
@@ -184,6 +254,47 @@ async def help_command(message: Message) -> None:
     )
 
 
+@router.message(Command("import"))
+async def import_command(message: Message, command: CommandObject) -> None:
+    if await reject_message_if_unauthorized(message):
+        return
+
+    if await reject_message_if_untrusted_user(message):
+        return
+
+    await _ensure_actor_from_message(message)
+
+    raw_value = (command.args or "").strip()
+
+    if not raw_value:
+        await message.answer(
+            "📝 <b>Ajouter une recette</b>\n\n"
+            "Colle une recette après la commande, ou utilise les boutons.\n\n"
+            "Exemples :\n"
+            "<code>/import https://example.com/recette</code>\n"
+            "<code>/import riz, œufs, courgettes...</code>",
+            reply_markup=import_menu_keyboard(),
+        )
+        return
+
+    source_type = "url" if _looks_like_url(raw_value) else "text"
+
+    async with AsyncSessionLocal() as session:
+        draft = await create_recipe_import_draft(
+            session,
+            source_type=source_type,
+            source_url=raw_value if source_type == "url" else None,
+            raw_text=raw_value if source_type == "text" else None,
+            submitted_by_user_id=message.from_user.id,
+            submitted_by_name=_message_author_name(message),
+        )
+
+    await message.answer(
+        _draft_preview_text(draft),
+        reply_markup=import_draft_keyboard(draft.id),
+    )
+
+
 @router.callback_query(F.data == "menu")
 async def show_menu(callback: CallbackQuery) -> None:
     if await reject_callback_if_unauthorized(callback):
@@ -197,6 +308,243 @@ async def show_menu(callback: CallbackQuery) -> None:
             "Que veux-tu faire ?",
             reply_markup=main_menu_keyboard(),
         )
+
+
+@router.callback_query(F.data == "help:menu")
+async def show_help_menu(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    await callback.answer()
+
+    if callback.message:
+        await callback.message.edit_text(
+            "🍽️ <b>cenabobot</b>\n\n"
+            "Le bot propose une recette fiable à la fois depuis le catalogue privé.\n\n"
+            "En groupe, chacun peut répondre :\n"
+            "✅ Ça me va\n"
+            "🙅 Pas ce soir\n\n"
+            "Règle importante : aucune recette inventée en direct. "
+            "Une recette doit être enregistrée avant d’être proposée.",
+            reply_markup=main_menu_keyboard(),
+        )
+
+
+@router.callback_query(F.data == "import:menu")
+async def show_import_menu(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+    await callback.answer()
+
+    if callback.message:
+        await callback.message.edit_text(
+            "📝 <b>Ajouter une recette</b>\n\n"
+            "Tu peux proposer une recette depuis un lien ou depuis un texte collé.\n\n"
+            "Pour ce passage V2.5b, le bot crée la fiche d’attente. "
+            "La génération YAML/AI arrive dans le prochain passage.",
+            reply_markup=import_menu_keyboard(),
+        )
+
+
+@router.callback_query(F.data == "import:url")
+async def import_from_url_skeleton(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+    await callback.answer()
+
+    if callback.message:
+        await callback.message.edit_text(
+            "🔗 <b>Import depuis un lien</b>\n\n"
+            "Pour l’instant, utilise la commande :\n"
+            "<code>/import https://example.com/recette</code>\n\n"
+            "Le bot enregistrera le lien comme brouillon en attente. "
+            "La lecture automatique du lien et l’IA arrivent au prochain passage.",
+            reply_markup=import_menu_keyboard(),
+        )
+
+
+@router.callback_query(F.data == "import:text")
+async def import_from_text_skeleton(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+    await callback.answer()
+
+    if callback.message:
+        await callback.message.edit_text(
+            "📋 <b>Import depuis un texte</b>\n\n"
+            "Pour l’instant, utilise la commande :\n"
+            "<code>/import riz, œufs, courgettes...</code>\n\n"
+            "Le bot enregistrera le texte comme brouillon en attente. "
+            "La transformation en YAML arrive au prochain passage.",
+            reply_markup=import_menu_keyboard(),
+        )
+
+
+@router.callback_query(F.data == "import:pending")
+async def import_pending(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+    await callback.answer()
+
+    async with AsyncSessionLocal() as session:
+        drafts = await list_pending_recipe_import_drafts(session)
+
+    if not callback.message:
+        return
+
+    if not drafts:
+        await callback.message.edit_text(
+            "📚 <b>Recettes en attente</b>\n\n"
+            "Aucun brouillon en attente pour l’instant.",
+            reply_markup=import_menu_keyboard(),
+        )
+        return
+
+    items = [(draft.id, draft_display_title(draft)) for draft in drafts]
+
+    await callback.message.edit_text(
+        "📚 <b>Recettes en attente</b>\n\n"
+        "Choisis un brouillon à ouvrir.",
+        reply_markup=import_drafts_keyboard(items),
+    )
+
+
+@router.callback_query(F.data.startswith("import:open:"))
+async def import_open(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+    await callback.answer()
+
+    if not callback.data or not callback.message:
+        return
+
+    _, _, draft_id_text = callback.data.split(":", 2)
+
+    try:
+        draft_id = int(draft_id_text)
+    except ValueError:
+        await callback.answer("Brouillon invalide.", show_alert=False)
+        return
+
+    async with AsyncSessionLocal() as session:
+        draft = await get_recipe_import_draft(session, draft_id)
+
+    if draft is None:
+        await callback.message.edit_text(
+            "Brouillon introuvable.",
+            reply_markup=import_menu_keyboard(),
+        )
+        return
+
+    await callback.message.edit_text(
+        _draft_preview_text(draft),
+        reply_markup=import_draft_keyboard(draft.id),
+    )
+
+
+@router.callback_query(F.data.startswith("import:reject:"))
+async def import_reject(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+
+    if not callback.data or not callback.message:
+        await callback.answer()
+        return
+
+    _, _, draft_id_text = callback.data.split(":", 2)
+
+    try:
+        draft_id = int(draft_id_text)
+    except ValueError:
+        await callback.answer("Brouillon invalide.", show_alert=False)
+        return
+
+    async with AsyncSessionLocal() as session:
+        draft = await reject_recipe_import_draft(session, draft_id)
+
+    if draft is None:
+        await callback.answer("Brouillon introuvable.", show_alert=False)
+        return
+
+    await callback.answer("Brouillon refusé.", show_alert=False)
+    await callback.message.edit_text(
+        "🗑️ Brouillon refusé.",
+        reply_markup=import_menu_keyboard(),
+    )
+
+
+@router.callback_query(F.data.startswith("import:approve:"))
+async def import_approve_skeleton(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+
+    if not callback.data or not callback.message or not callback.from_user:
+        await callback.answer()
+        return
+
+    _, _, draft_id_text = callback.data.split(":", 2)
+
+    try:
+        draft_id = int(draft_id_text)
+    except ValueError:
+        await callback.answer("Brouillon invalide.", show_alert=False)
+        return
+
+    async with AsyncSessionLocal() as session:
+        draft, approved, message = await try_approve_recipe_import_draft_skeleton(
+            session,
+            draft_id=draft_id,
+            approved_by_user_id=callback.from_user.id,
+        )
+
+    if draft is None:
+        await callback.answer("Brouillon introuvable.", show_alert=False)
+        return
+
+    if approved:
+        await callback.answer("Brouillon approuvé.", show_alert=False)
+    else:
+        await callback.answer(message, show_alert=True)
+
+    await callback.message.edit_text(
+        _draft_preview_text(draft),
+        reply_markup=import_draft_keyboard(draft.id),
+    )
 
 
 @router.callback_query(F.data.startswith("suggest:"))
@@ -576,6 +924,6 @@ async def fallback(message: Message) -> None:
 
     await message.answer(
         "Utilise les boutons pour l’instant.\n\n"
-        "V2 n’a pas encore d’IA ni de compréhension en texte libre.",
+        "Pour ajouter une recette, utilise 📝 Ajouter une recette dans le menu.",
         reply_markup=main_menu_keyboard(),
     )

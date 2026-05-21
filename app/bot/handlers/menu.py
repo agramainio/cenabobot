@@ -594,7 +594,7 @@ async def import_reject(callback: CallbackQuery) -> None:
         return
 
     async with AsyncSessionLocal() as session:
-        draft = await reject_recipe_import_draft(session, draft_id)
+        draft = await reject_recipe_import_draft(session, draft_id=draft_id)
 
     if draft is None:
         await callback.answer("Brouillon introuvable.", show_alert=False)

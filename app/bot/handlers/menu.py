@@ -278,10 +278,11 @@ async def import_command(message: Message, command: CommandObject) -> None:
     if not raw_value:
         await message.answer(
             "📝 <b>Ajouter une recette</b>\n\n"
-            "Colle une recette après la commande, ou utilise les boutons.\n\n"
+            "Envoie un lien ou une recette après <code>/import</code>.\n\n"
             "Exemples :\n"
             "<code>/import https://example.com/recette</code>\n"
-            "<code>/import riz, œufs, courgettes...</code>",
+            "<code>/import riz sauté, œufs, courgettes, préparation...</code>\n\n"
+            "Rien n’est ajouté au catalogue sans approbation.",
             reply_markup=import_menu_keyboard(),
         )
         return
@@ -354,8 +355,8 @@ async def show_import_menu(callback: CallbackQuery) -> None:
         await callback.message.edit_text(
             "📝 <b>Ajouter une recette</b>\n\n"
             "Tu peux proposer une recette depuis un lien ou depuis un texte collé.\n\n"
-            "Pour ce passage V2.5b, le bot crée la fiche d’attente. "
-            "La génération YAML/AI arrive dans le prochain passage.",
+            "Le bot prépare un brouillon structuré avec OpenAI. "
+            "La recette n’entre dans le catalogue qu’après approbation.",
             reply_markup=import_menu_keyboard(),
         )
 
@@ -374,10 +375,9 @@ async def import_from_url_skeleton(callback: CallbackQuery) -> None:
     if callback.message:
         await callback.message.edit_text(
             "🔗 <b>Import depuis un lien</b>\n\n"
-            "Pour l’instant, utilise la commande :\n"
+            "Envoie le lien avec :\n"
             "<code>/import https://example.com/recette</code>\n\n"
-            "Le bot enregistrera le lien comme brouillon en attente. "
-            "La lecture automatique du lien et l’IA arrivent au prochain passage.",
+            "Le bot lira la page, préparera un brouillon, puis demandera une approbation.",
             reply_markup=import_menu_keyboard(),
         )
 
@@ -396,10 +396,9 @@ async def import_from_text_skeleton(callback: CallbackQuery) -> None:
     if callback.message:
         await callback.message.edit_text(
             "📋 <b>Import depuis un texte</b>\n\n"
-            "Pour l’instant, utilise la commande :\n"
-            "<code>/import riz, œufs, courgettes...</code>\n\n"
-            "Le bot enregistrera le texte comme brouillon en attente. "
-            "La transformation en YAML arrive au prochain passage.",
+            "Envoie la recette avec :\n"
+            "<code>/import titre, ingrédients, préparation...</code>\n\n"
+            "Le bot préparera un brouillon structuré, puis demandera une approbation.",
             reply_markup=import_menu_keyboard(),
         )
 
@@ -596,6 +595,18 @@ async def import_approve(callback: CallbackQuery) -> None:
 
     if approved:
         await callback.answer("Recette ajoutée au catalogue.", show_alert=False)
+
+        if draft.proposed_recipe_id:
+            async with AsyncSessionLocal() as session:
+                recipe = await get_recipe(session, draft.proposed_recipe_id)
+
+            if recipe is not None:
+                await callback.message.edit_text(
+                    "✅ <b>Recette ajoutée au catalogue</b>\n\n"
+                    + recipe_detail_text(recipe),
+                    reply_markup=recipe_keyboard(recipe.id, "any", recipe.servings),
+                )
+                return
     else:
         await callback.answer(message, show_alert=True)
 

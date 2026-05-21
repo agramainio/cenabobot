@@ -133,3 +133,28 @@ def favorites_keyboard(recipe_ids: list[str]) -> InlineKeyboardMarkup:
     ]
     rows.append([InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def import_drafts_keyboard(drafts: list[tuple[int, str]]) -> InlineKeyboardMarkup:
+    rows = [
+        [InlineKeyboardButton(text=f"📝 {title}", callback_data=f"import:open:{draft_id}")]
+        for draft_id, title in drafts
+    ]
+
+    rows.append([InlineKeyboardButton(text="📝 Ajouter une recette", callback_data="import:menu")])
+    rows.append([InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def import_draft_keyboard(draft_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✅ Approuver", callback_data=f"import:approve:{draft_id}"),
+                InlineKeyboardButton(text="🗑️ Refuser", callback_data=f"import:reject:{draft_id}"),
+            ],
+            [InlineKeyboardButton(text="📚 Recettes en attente", callback_data="import:pending")],
+            [InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")],
+        ]
+    )
+

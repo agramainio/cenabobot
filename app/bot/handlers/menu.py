@@ -34,7 +34,7 @@ from app.services.recipe_imports import (
     get_recipe_import_draft,
     list_pending_recipe_import_drafts,
     reject_recipe_import_draft,
-    try_approve_recipe_import_draft_skeleton,
+    approve_recipe_import_draft,
 )
 from app.services.recipes import (
     FILTER_LABELS,
@@ -78,10 +78,19 @@ def _draft_preview_text(draft) -> str:
             excerpt = excerpt[:500].rstrip() + "…"
         lines.extend(["", "<b>Texte reçu</b>", escape(excerpt)])
 
+    if draft.proposed_recipe_id:
+        lines.append(f"Recipe ID : <code>{escape(draft.proposed_recipe_id)}</code>")
+
     if draft.proposed_yaml:
-        lines.extend(["", "✅ YAML proposé disponible."])
+        if draft.validation_errors:
+            lines.extend(["", "⚠️ YAML proposé, mais validation incomplète."])
+        else:
+            lines.extend(["", "✅ YAML proposé et validable."])
     else:
         lines.extend(["", "⚠️ YAML non généré pour l’instant."])
+
+    if draft.status == "approved":
+        lines.extend(["", "✅ <b>Recette ajoutée au catalogue.</b>"])
 
     if draft.warnings:
         lines.extend(["", "<b>À vérifier</b>", escape(draft.warnings)])
@@ -467,6 +476,55 @@ async def import_open(callback: CallbackQuery) -> None:
     )
 
 
+@router.callback_query(F.data.startswith("import:yaml:"))
+async def import_yaml(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    if await reject_callback_if_untrusted_user(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+    await callback.answer()
+
+    if not callback.data or not callback.message:
+        return
+
+    _, _, draft_id_text = callback.data.split(":", 2)
+
+    try:
+        draft_id = int(draft_id_text)
+    except ValueError:
+        await callback.answer("Brouillon invalide.", show_alert=False)
+        return
+
+    async with AsyncSessionLocal() as session:
+        draft = await get_recipe_import_draft(session, draft_id)
+
+    if draft is None:
+        await callback.message.edit_text(
+            "Brouillon introuvable.",
+            reply_markup=import_menu_keyboard(),
+        )
+        return
+
+    if not draft.proposed_yaml:
+        await callback.message.edit_text(
+            "Aucun YAML proposé pour ce brouillon.",
+            reply_markup=import_draft_keyboard(draft.id),
+        )
+        return
+
+    yaml_text = escape(draft.proposed_yaml)
+    if len(yaml_text) > 3500:
+        yaml_text = yaml_text[:3500].rstrip() + "\n…"
+
+    await callback.message.edit_text(
+        f"👀 <b>YAML proposé</b>\n\n<pre>{yaml_text}</pre>",
+        reply_markup=import_draft_keyboard(draft.id),
+    )
+
+
 @router.callback_query(F.data.startswith("import:reject:"))
 async def import_reject(callback: CallbackQuery) -> None:
     if await reject_callback_if_unauthorized(callback):
@@ -504,7 +562,7 @@ async def import_reject(callback: CallbackQuery) -> None:
 
 
 @router.callback_query(F.data.startswith("import:approve:"))
-async def import_approve_skeleton(callback: CallbackQuery) -> None:
+async def import_approve(callback: CallbackQuery) -> None:
     if await reject_callback_if_unauthorized(callback):
         return
 
@@ -526,7 +584,7 @@ async def import_approve_skeleton(callback: CallbackQuery) -> None:
         return
 
     async with AsyncSessionLocal() as session:
-        draft, approved, message = await try_approve_recipe_import_draft_skeleton(
+        draft, approved, message = await approve_recipe_import_draft(
             session,
             draft_id=draft_id,
             approved_by_user_id=callback.from_user.id,
@@ -537,7 +595,7 @@ async def import_approve_skeleton(callback: CallbackQuery) -> None:
         return
 
     if approved:
-        await callback.answer("Brouillon approuvé.", show_alert=False)
+        await callback.answer("Recette ajoutée au catalogue.", show_alert=False)
     else:
         await callback.answer(message, show_alert=True)
 

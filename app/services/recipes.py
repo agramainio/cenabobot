@@ -323,6 +323,7 @@ async def replace_recipe_details(
     else:
         existing.title = recipe.title
         existing.short_description = recipe.short_description
+        existing.notes = recipe.notes
         existing.source_name = recipe.source_name
         existing.source_url = recipe.source_url
         existing.servings = recipe.servings

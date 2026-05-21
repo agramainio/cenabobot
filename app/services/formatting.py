@@ -124,8 +124,10 @@ def recipe_detail_text(recipe: Recipe) -> str:
         f"Tags : {escape(tags)}\n\n"
         f"<b>Ingrédients</b>\n"
         f"{ingredients or '- Aucun ingrédient renseigné'}\n\n"
-        f"<b>Notes</b>\n"
-        f"{escape(recipe.short_description or 'Pas encore de notes.')}"
+        f"<b>Résumé</b>\n"
+        f"{escape(recipe.short_description or 'Pas encore de résumé.')}\n\n"
+        f"<b>Préparation</b>\n"
+        f"{escape(getattr(recipe, 'notes', None) or 'Pas encore de préparation détaillée.')}"
         f"{source}"
     )
 

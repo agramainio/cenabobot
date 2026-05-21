@@ -4,9 +4,12 @@ import re
 import unicodedata
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
+from html import unescape
 from textwrap import shorten
 from typing import Any
+from urllib.parse import urlparse
 
+import aiohttp
 import yaml
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,6 +37,10 @@ KNOWN_TAGS = {
     "cheap",
     "common_paris_ingredients",
 }
+
+
+class RecipeUrlFetchError(RuntimeError):
+    pass
 
 
 def draft_display_title(draft: RecipeImportDraft) -> str:
@@ -89,21 +96,80 @@ def _errors_text(errors: list[str]) -> str | None:
     return "\n".join(f"- {item}" for item in sorted(set(clean)))
 
 
-async def generate_recipe_yaml_from_text(
+def _source_name_from_url(url: str) -> str:
+    parsed = urlparse(url)
+    hostname = parsed.hostname or "import URL"
+    return hostname.removeprefix("www.")
+
+
+def _html_to_compact_text(html: str) -> str:
+    text = re.sub(r"(?is)<script.*?</script>", " ", html)
+    text = re.sub(r"(?is)<style.*?</style>", " ", text)
+    text = re.sub(r"(?is)<noscript.*?</noscript>", " ", text)
+
+    # Preserve some useful boundaries before stripping tags.
+    text = re.sub(r"(?i)</(p|div|li|h1|h2|h3|h4|tr|section|article)>", "\n", text)
+    text = re.sub(r"(?i)<br\s*/?>", "\n", text)
+
+    text = re.sub(r"(?s)<[^>]+>", " ", text)
+    text = unescape(text)
+    text = re.sub(r"[ \t\r\f\v]+", " ", text)
+    text = re.sub(r"\n\s+", "\n", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    compact = "\n".join(lines)
+
+    # Keep prompt cost bounded.
+    return compact[:18000]
+
+
+async def fetch_recipe_url_text(url: str) -> str:
+    parsed = urlparse(url)
+
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise RecipeUrlFetchError("URL invalide. Utilise un lien http(s).")
+
+    timeout = aiohttp.ClientTimeout(total=20)
+
+    headers = {
+        "User-Agent": "cenabobot/0.1 private recipe importer",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    }
+
+    try:
+        async with aiohttp.ClientSession(timeout=timeout, headers=headers) as client:
+            async with client.get(url, allow_redirects=True) as response:
+                if response.status >= 400:
+                    raise RecipeUrlFetchError(f"Impossible de lire l’URL : HTTP {response.status}")
+
+                content_type = response.headers.get("content-type", "")
+                raw = await response.text(errors="ignore")
+    except RecipeUrlFetchError:
+        raise
+    except Exception as exc:
+        raise RecipeUrlFetchError(f"Erreur de lecture de l’URL : {exc}") from exc
+
+    if "html" not in content_type.lower() and len(raw) > 50000:
+        raise RecipeUrlFetchError("Le lien ne ressemble pas à une page HTML de recette.")
+
+    text = _html_to_compact_text(raw)
+
+    if len(text) < 200:
+        raise RecipeUrlFetchError("Texte de recette insuffisant après lecture de la page.")
+
+    return text
+
+
+async def _data_to_yaml_result(
     session: AsyncSession,
-    raw_text: str,
+    data: dict[str, Any],
+    *,
+    source_name: str,
+    source_url: str,
 ) -> tuple[str | None, str | None, str | None, list[str], list[str]]:
     warnings: list[str] = []
     errors: list[str] = []
-
-    normalized_raw = raw_text.strip()
-    if not normalized_raw:
-        return None, None, None, [], ["Texte vide."]
-
-    try:
-        data = await generate_recipe_draft_data(normalized_raw)
-    except OpenAIRecipeDraftError as exc:
-        return None, None, None, [], [str(exc)]
 
     title = str(data.get("title") or "").strip()
     if not title:
@@ -120,8 +186,8 @@ async def generate_recipe_yaml_from_text(
 
     data["id"] = recipe_id
     data["title"] = title
-    data["source_name"] = "import texte"
-    data["source_url"] = ""
+    data["source_name"] = source_name
+    data["source_url"] = source_url
 
     ai_warnings = data.get("warnings")
     if isinstance(ai_warnings, list):
@@ -141,6 +207,55 @@ async def generate_recipe_yaml_from_text(
     )
 
     return recipe_id, title, proposed_yaml, sorted(set(warnings)), sorted(set(errors))
+
+
+async def generate_recipe_yaml_from_text(
+    session: AsyncSession,
+    raw_text: str,
+) -> tuple[str | None, str | None, str | None, list[str], list[str]]:
+    normalized_raw = raw_text.strip()
+    if not normalized_raw:
+        return None, None, None, [], ["Texte vide."]
+
+    try:
+        data = await generate_recipe_draft_data(normalized_raw)
+    except OpenAIRecipeDraftError as exc:
+        return None, None, None, [], [str(exc)]
+
+    return await _data_to_yaml_result(
+        session,
+        data,
+        source_name="import texte",
+        source_url="",
+    )
+
+
+async def generate_recipe_yaml_from_url(
+    session: AsyncSession,
+    source_url: str,
+) -> tuple[str | None, str | None, str | None, list[str], list[str]]:
+    warnings: list[str] = []
+
+    try:
+        page_text = await fetch_recipe_url_text(source_url)
+    except RecipeUrlFetchError as exc:
+        return None, None, None, [], [str(exc)]
+
+    try:
+        data = await generate_recipe_draft_data(page_text, source_url=source_url)
+    except OpenAIRecipeDraftError as exc:
+        return None, None, None, [], [str(exc)]
+
+    warnings.append("Recette extraite depuis une page web : vérifier les quantités, tags et étapes.")
+
+    recipe_id, title, proposed_yaml, ai_warnings, errors = await _data_to_yaml_result(
+        session,
+        data,
+        source_name=_source_name_from_url(source_url),
+        source_url=source_url,
+    )
+
+    return recipe_id, title, proposed_yaml, sorted(set(warnings + ai_warnings)), errors
 
 
 async def validate_recipe_draft_data(
@@ -163,6 +278,9 @@ async def validate_recipe_draft_data(
 
     if not str(data.get("short_description") or "").strip():
         warnings.append("short_description manquant.")
+
+    if not str(data.get("notes") or "").strip():
+        warnings.append("notes/préparation manquantes.")
 
     servings = data.get("servings")
     if not isinstance(servings, int) or servings <= 0:
@@ -254,9 +372,14 @@ async def create_recipe_import_draft(
             warnings,
             errors,
         ) = await generate_recipe_yaml_from_text(session, raw_text)
-    elif source_type == "url":
-        warnings.append("Import URL enregistré, mais lecture automatique du lien non encore implémentée.")
-        errors.append("Le brouillon structuré n’existe pas encore pour les URL.")
+    elif source_type == "url" and source_url:
+        (
+            proposed_recipe_id,
+            proposed_title,
+            proposed_yaml,
+            warnings,
+            errors,
+        ) = await generate_recipe_yaml_from_url(session, source_url)
     else:
         errors.append("Source de brouillon invalide ou vide.")
 
@@ -336,7 +459,8 @@ def _recipe_objects_from_yaml(proposed_yaml: str) -> tuple[Recipe, list[str], li
     recipe = Recipe(
         id=recipe_id,
         title=str(data["title"]).strip(),
-        short_description=str(data.get("short_description") or data.get("notes") or ""),
+        short_description=str(data.get("short_description") or ""),
+        notes=str(data.get("notes") or ""),
         source_name=data.get("source_name"),
         source_url=data.get("source_url"),
         servings=int(data.get("servings") or 2),

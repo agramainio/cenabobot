@@ -6,16 +6,36 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 def main_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🍽 Idée repas", callback_data="suggest:any")],
+            [InlineKeyboardButton(text="🍽️ Proposer un repas", callback_data="suggest:any")],
             [
                 InlineKeyboardButton(text="🥬 Végétarien", callback_data="suggest:vegetarian"),
-                InlineKeyboardButton(text="🚫 Sans lactose", callback_data="suggest:no_lactose"),
+                InlineKeyboardButton(text="⚡ Rapide", callback_data="suggest:fast"),
             ],
             [
                 InlineKeyboardButton(text="🚫 Sans viande", callback_data="suggest:no_meat"),
-                InlineKeyboardButton(text="⚡ Rapide", callback_data="suggest:fast"),
+                InlineKeyboardButton(text="🥛 Sans lactose", callback_data="suggest:no_lactose"),
             ],
-            [InlineKeyboardButton(text="⭐ Favoris", callback_data="favorites")],
+            [
+                InlineKeyboardButton(text="⭐ Favoris", callback_data="favorites"),
+                InlineKeyboardButton(text="📝 Ajouter une recette", callback_data="import:menu"),
+            ],
+            [
+                InlineKeyboardButton(text="📚 En attente", callback_data="import:pending"),
+                InlineKeyboardButton(text="⚙️ Aide", callback_data="help:menu"),
+            ],
+        ]
+    )
+
+
+def import_menu_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="🔗 Depuis un lien", callback_data="import:url"),
+                InlineKeyboardButton(text="📋 Depuis un texte", callback_data="import:text"),
+            ],
+            [InlineKeyboardButton(text="📚 Recettes en attente", callback_data="import:pending")],
+            [InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")],
         ]
     )
 
@@ -31,26 +51,28 @@ def suggestion_keyboard(
     if proposal_id is not None:
         rows.append(
             [
-                InlineKeyboardButton(text="Ça me va", callback_data=f"vote:ok:{proposal_id}"),
-                InlineKeyboardButton(text="Pas ce soir", callback_data=f"vote:no:{proposal_id}"),
+                InlineKeyboardButton(text="✅ Ça me va", callback_data=f"vote:ok:{proposal_id}"),
+                InlineKeyboardButton(text="🙅 Pas ce soir", callback_data=f"vote:no:{proposal_id}"),
             ]
         )
 
     rows.extend(
         [
             [
-                InlineKeyboardButton(text="Voir la recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
-                InlineKeyboardButton(text="Liste de courses", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}"),
+                InlineKeyboardButton(text="👀 Recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
+                InlineKeyboardButton(text="🛒 Courses", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}"),
             ],
             [
-                InlineKeyboardButton(text="Idée suivante", callback_data=f"next:{filter_key}"),
-                InlineKeyboardButton(text="Enregistrer", callback_data=f"save:{recipe_id}"),
+                InlineKeyboardButton(text="🔁 Autre idée", callback_data=f"next:{filter_key}"),
+                InlineKeyboardButton(text="⭐ Garder", callback_data=f"save:{recipe_id}"),
             ],
         ]
     )
 
     if proposal_id is None:
-        rows.append([InlineKeyboardButton(text="Pas ça", callback_data=f"reject:{filter_key}:{recipe_id}")])
+        rows.append([InlineKeyboardButton(text="🙅 Pas ce repas", callback_data=f"reject:{filter_key}:{recipe_id}")])
+
+    rows.append([InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")])
 
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -64,11 +86,12 @@ def accepted_meal_keyboard(
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="Voir la recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
-                InlineKeyboardButton(text="Liste finale", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}"),
+                InlineKeyboardButton(text="👀 Recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
+                InlineKeyboardButton(text="🛒 Liste finale", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}"),
             ],
-            [InlineKeyboardButton(text="Marquer comme fait", callback_data=f"done:{proposal_id}")],
-            [InlineKeyboardButton(text="Idée suivante", callback_data=f"next:{filter_key}")],
+            [InlineKeyboardButton(text="✅ Marquer comme fait", callback_data=f"done:{proposal_id}")],
+            [InlineKeyboardButton(text="🔁 Autre idée", callback_data=f"next:{filter_key}")],
+            [InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")],
         ]
     )
 
@@ -76,12 +99,12 @@ def accepted_meal_keyboard(
 def recipe_keyboard(recipe_id: str, filter_key: str, servings: int = 2) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Liste de courses", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}")],
+            [InlineKeyboardButton(text="🛒 Courses", callback_data=f"shop:{filter_key}:{recipe_id}:{servings}")],
             [
-                InlineKeyboardButton(text="Enregistrer", callback_data=f"save:{recipe_id}"),
-                InlineKeyboardButton(text="Idée suivante", callback_data=f"next:{filter_key}"),
+                InlineKeyboardButton(text="⭐ Garder", callback_data=f"save:{recipe_id}"),
+                InlineKeyboardButton(text="🔁 Autre idée", callback_data=f"next:{filter_key}"),
             ],
-            [InlineKeyboardButton(text="Menu", callback_data="menu")],
+            [InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")],
         ]
     )
 
@@ -90,23 +113,23 @@ def shopping_keyboard(recipe_id: str, filter_key: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="1 personne", callback_data=f"shop:{filter_key}:{recipe_id}:1"),
-                InlineKeyboardButton(text="2 personnes", callback_data=f"shop:{filter_key}:{recipe_id}:2"),
-                InlineKeyboardButton(text="4 personnes", callback_data=f"shop:{filter_key}:{recipe_id}:4"),
+                InlineKeyboardButton(text="👤 1", callback_data=f"shop:{filter_key}:{recipe_id}:1"),
+                InlineKeyboardButton(text="👥 2", callback_data=f"shop:{filter_key}:{recipe_id}:2"),
+                InlineKeyboardButton(text="👥 4", callback_data=f"shop:{filter_key}:{recipe_id}:4"),
             ],
             [
-                InlineKeyboardButton(text="Recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
-                InlineKeyboardButton(text="Idée suivante", callback_data=f"next:{filter_key}"),
+                InlineKeyboardButton(text="👀 Recette", callback_data=f"recipe:{filter_key}:{recipe_id}"),
+                InlineKeyboardButton(text="🔁 Autre idée", callback_data=f"next:{filter_key}"),
             ],
-            [InlineKeyboardButton(text="Menu", callback_data="menu")],
+            [InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")],
         ]
     )
 
 
 def favorites_keyboard(recipe_ids: list[str]) -> InlineKeyboardMarkup:
     rows = [
-        [InlineKeyboardButton(text=f"Ouvrir {index + 1}", callback_data=f"recipe:any:{recipe_id}")]
+        [InlineKeyboardButton(text=f"👀 Ouvrir {index + 1}", callback_data=f"recipe:any:{recipe_id}")]
         for index, recipe_id in enumerate(recipe_ids)
     ]
-    rows.append([InlineKeyboardButton(text="Menu", callback_data="menu")])
+    rows.append([InlineKeyboardButton(text="⬅️ Menu", callback_data="menu")])
     return InlineKeyboardMarkup(inline_keyboard=rows)

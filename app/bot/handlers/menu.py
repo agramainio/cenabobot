@@ -4,7 +4,7 @@ from html import escape
 
 from aiogram import F, Router
 from aiogram.filters import Command, CommandObject
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, LinkPreviewOptions, Message
 
 from app.bot.keyboards.menu import (
     accepted_meal_keyboard,
@@ -56,6 +56,7 @@ router = Router()
 # In-memory state for the button-first import flow.
 # If the bot restarts between prompt and reply, the user simply taps the import button again.
 PENDING_IMPORT_INPUTS: dict[tuple[int, int], str] = {}
+NO_LINK_PREVIEW = LinkPreviewOptions(is_disabled=True)
 
 
 
@@ -342,6 +343,7 @@ async def import_command(message: Message, command: CommandObject) -> None:
     await message.answer(
         _draft_preview_text(draft),
         reply_markup=import_draft_keyboard(draft.id),
+        link_preview_options=NO_LINK_PREVIEW,
     )
 
 
@@ -415,15 +417,9 @@ async def import_from_url_skeleton(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            "🔗 <b>Import depuis un lien</b>
-
-"
-            "Colle maintenant le lien de la recette dans le chat.
-
-"
-            "Le bot lira la page, préparera un brouillon structuré, puis demandera une approbation.
-
-"
+            "🔗 <b>Import depuis un lien</b>\n\n"
+            "Colle maintenant le lien de la recette dans le chat.\n\n"
+            "Le bot lira la page, préparera un brouillon structuré, puis demandera une approbation.\n\n"
             "Rien n’est ajouté au catalogue sans validation.",
             reply_markup=import_menu_keyboard(),
         )
@@ -443,16 +439,10 @@ async def import_from_text_skeleton(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            "📋 <b>Import depuis un texte</b>
-
-"
-            "Colle maintenant la recette dans le chat.
-
-"
+            "📋 <b>Import depuis un texte</b>\n\n"
+            "Colle maintenant la recette dans le chat.\n\n"
             "Tu peux envoyer un texte simple avec titre, portions, temps, ingrédients et préparation. "
-            "Le bot préparera un brouillon structuré, puis demandera une approbation.
-
-"
+            "Le bot préparera un brouillon structuré, puis demandera une approbation.\n\n"
             "Rien n’est ajouté au catalogue sans validation.",
             reply_markup=import_menu_keyboard(),
         )
@@ -527,6 +517,7 @@ async def import_open(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
         _draft_preview_text(draft),
         reply_markup=import_draft_keyboard(draft.id),
+        link_preview_options=NO_LINK_PREVIEW,
     )
 
 
@@ -576,6 +567,7 @@ async def import_yaml(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
         f"👀 <b>YAML proposé</b>\n\n<pre>{yaml_text}</pre>",
         reply_markup=import_draft_keyboard(draft.id),
+        link_preview_options=NO_LINK_PREVIEW,
     )
 
 
@@ -653,13 +645,15 @@ async def import_approve(callback: CallbackQuery) -> None:
 
         if draft.proposed_recipe_id:
             async with AsyncSessionLocal() as session:
+                refreshed_draft = await get_recipe_import_draft(session, draft.id)
                 recipe = await get_recipe(session, draft.proposed_recipe_id)
 
-            if recipe is not None:
+            if recipe is not None and refreshed_draft is not None and refreshed_draft.status == "approved":
                 await callback.message.edit_text(
                     "✅ <b>Recette ajoutée au catalogue</b>\n\n"
                     + recipe_detail_text(recipe),
                     reply_markup=recipe_keyboard(recipe.id, "any", recipe.servings),
+                    link_preview_options=NO_LINK_PREVIEW,
                 )
                 return
     else:
@@ -668,6 +662,7 @@ async def import_approve(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
         _draft_preview_text(draft),
         reply_markup=import_draft_keyboard(draft.id),
+        link_preview_options=NO_LINK_PREVIEW,
     )
 
 
@@ -911,12 +906,14 @@ async def show_recipe(callback: CallbackQuery) -> None:
         await callback.message.answer(
             recipe_detail_text(recipe),
             reply_markup=recipe_keyboard(recipe.id, filter_key, recipe.servings),
+            link_preview_options=NO_LINK_PREVIEW,
         )
         return
 
     await callback.message.edit_text(
         recipe_detail_text(recipe),
         reply_markup=recipe_keyboard(recipe.id, filter_key, recipe.servings),
+        link_preview_options=NO_LINK_PREVIEW,
     )
 
 
@@ -1077,6 +1074,7 @@ async def receive_import_input(message: Message) -> None:
     await message.answer(
         _draft_preview_text(draft),
         reply_markup=import_draft_keyboard(draft.id),
+        link_preview_options=NO_LINK_PREVIEW,
     )
 
 

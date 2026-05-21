@@ -127,11 +127,12 @@ RECIPE_DRAFT_SCHEMA: dict[str, Any] = {
 
 
 SYSTEM_PROMPT = """
-Tu transformes une recette collée par un utilisateur autorisé en brouillon structuré pour cenabobot.
+Tu transformes une recette fournie par un utilisateur autorisé en brouillon structuré pour cenabobot.
 
 Règles produit :
 - cenabobot est un catalogue privé de recettes approuvées.
 - Tu ne dois pas inventer une recette différente.
+- Si le texte vient d’une page web, ignore la navigation, les publicités, les commentaires, les articles liés et tout contenu non-recette.
 - Tu dois extraire et structurer uniquement ce qui est présent ou clairement implicite.
 - Si une information manque, mets null ou une valeur par défaut prudente, puis ajoute un warning.
 - Ne traite jamais les lignes de métadonnées comme ingrédients.
@@ -148,7 +149,7 @@ Règles produit :
 """
 
 
-async def generate_recipe_draft_data(raw_text: str) -> dict[str, Any]:
+async def generate_recipe_draft_data(raw_text: str, source_url: str | None = None) -> dict[str, Any]:
     if not settings.OPENAI_API_KEY:
         raise OpenAIRecipeDraftError(
             "OPENAI_API_KEY n’est pas configuré dans .env.production."
@@ -166,7 +167,9 @@ async def generate_recipe_draft_data(raw_text: str) -> dict[str, Any]:
                 },
                 {
                     "role": "user",
-                    "content": raw_text.strip(),
+                    "content": (
+                        f"Source URL: {source_url}\n\n" if source_url else ""
+                    ) + raw_text.strip(),
                 },
             ],
             text={

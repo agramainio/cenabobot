@@ -23,6 +23,7 @@ class Recipe(Base):
     id: Mapped[str] = mapped_column(String(120), primary_key=True)
     title: Mapped[str] = mapped_column(String(240), nullable=False)
     short_description: Mapped[str | None] = mapped_column(Text)
+    notes: Mapped[str | None] = mapped_column(Text)
     source_name: Mapped[str | None] = mapped_column(String(160))
     source_url: Mapped[str | None] = mapped_column(Text)
 

@@ -158,3 +158,33 @@ class MealVote(Base):
     user_name: Mapped[str | None] = mapped_column(String(160))
     vote: Mapped[str] = mapped_column(String(40), nullable=False)
     updated_at: Mapped[object] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class RecipeImportDraft(Base):
+    __tablename__ = "recipe_import_drafts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    source_type: Mapped[str] = mapped_column(String(40), nullable=False)
+    source_url: Mapped[str | None] = mapped_column(Text)
+    raw_text: Mapped[str | None] = mapped_column(Text)
+
+    submitted_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("telegram_users.user_id", ondelete="SET NULL")
+    )
+    submitted_by_name: Mapped[str | None] = mapped_column(String(160))
+
+    status: Mapped[str] = mapped_column(String(40), default="pending", nullable=False)
+
+    proposed_recipe_id: Mapped[str | None] = mapped_column(String(120))
+    proposed_title: Mapped[str | None] = mapped_column(String(240))
+    proposed_yaml: Mapped[str | None] = mapped_column(Text)
+
+    warnings: Mapped[str | None] = mapped_column(Text)
+    validation_errors: Mapped[str | None] = mapped_column(Text)
+
+    approved_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("telegram_users.user_id", ondelete="SET NULL")
+    )
+    created_at: Mapped[object] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    approved_at: Mapped[object | None] = mapped_column(DateTime(timezone=True))
+

@@ -18,6 +18,46 @@ def is_authorized(user_id: int | None, chat_id: int | None) -> bool:
     return False
 
 
+
+def is_trusted_user(user_id: int | None) -> bool:
+    if user_id is None:
+        return False
+
+    return user_id in settings.allowed_user_ids
+
+
+def trusted_user_required_text(user_id: int | None) -> str:
+    return (
+        "Cette action est réservée aux utilisateurs autorisés.\n\n"
+        "Pour autoriser cette personne, ajoute son User ID à ALLOWED_USER_IDS "
+        "dans .env.production sur le VPS, puis redémarre le bot.\n\n"
+        f"User ID : <code>{user_id or ''}</code>"
+    )
+
+
+async def reject_message_if_untrusted_user(message: Message) -> bool:
+    user_id = message.from_user.id if message.from_user else None
+
+    if is_trusted_user(user_id):
+        return False
+
+    await message.answer(trusted_user_required_text(user_id))
+    return True
+
+
+async def reject_callback_if_untrusted_user(callback: CallbackQuery) -> bool:
+    user_id = callback.from_user.id if callback.from_user else None
+
+    if is_trusted_user(user_id):
+        return False
+
+    await callback.answer(
+        "Cette action est réservée aux utilisateurs autorisés.",
+        show_alert=True,
+    )
+    return True
+
+
 def identity_text(user_id: int | None, chat_id: int | None) -> str:
     return (
         "This bot is private.\n\n"

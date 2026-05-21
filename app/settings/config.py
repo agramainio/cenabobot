@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     APP_ENV: str = "development"
 
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o-mini"
+
     ALLOWED_USER_IDS: str = ""
     ALLOWED_CHAT_IDS: str = ""
 

@@ -12,62 +12,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Recipe, RecipeImportDraft, RecipeIngredient
+from app.services.openai_recipe_drafts import (
+    OpenAIRecipeDraftError,
+    generate_recipe_draft_data,
+)
 from app.services.recipes import replace_recipe_details
 
-
-DAIRY_KEYWORDS = {
-    "lait",
-    "crème",
-    "creme",
-    "beurre",
-    "fromage",
-    "yaourt",
-    "yogourt",
-    "feta",
-    "mozzarella",
-    "parmesan",
-    "ricotta",
-    "chèvre",
-    "chevre",
-    "emmental",
-    "comté",
-    "comte",
-    "gruyère",
-    "gruyere",
-}
-
-EGG_KEYWORDS = {"œuf", "oeuf", "œufs", "oeufs", "egg", "eggs"}
-
-FISH_KEYWORDS = {
-    "thon",
-    "saumon",
-    "sardine",
-    "maquereau",
-    "cabillaud",
-    "poisson",
-    "crevette",
-    "crevettes",
-    "anchois",
-    "truite",
-    "colin",
-    "merlu",
-}
-
-MEAT_KEYWORDS = {
-    "poulet",
-    "jambon",
-    "lard",
-    "boeuf",
-    "bœuf",
-    "porc",
-    "saucisse",
-    "chorizo",
-    "dinde",
-    "veau",
-    "agneau",
-    "canard",
-    "bacon",
-}
 
 KNOWN_TAGS = {
     "vegetarian",
@@ -111,173 +61,6 @@ def _slugify(value: str) -> str:
     return value or "recette_importee"
 
 
-def _clean_line(value: str) -> str:
-    value = value.strip()
-    value = re.sub(r"^[-*•]\s*", "", value)
-    value = re.sub(r"^\d+[.)]\s*", "", value)
-    return value.strip()
-
-
-def _normalize_text(value: str) -> str:
-    return _strip_accents(value.lower())
-
-
-def _contains_any(value: str, keywords: set[str]) -> bool:
-    normalized = _normalize_text(value)
-    return any(_normalize_text(keyword) in normalized for keyword in keywords)
-
-
-def _extract_minutes(raw_text: str) -> tuple[int | None, list[str]]:
-    warnings: list[str] = []
-    text = raw_text.lower()
-
-    explicit = re.search(r"(\d{1,3})\s*(?:min|minutes)", text)
-    if explicit:
-        return int(explicit.group(1)), warnings
-
-    hours = re.search(r"(\d{1,2})\s*(?:h|heure|heures)", text)
-    if hours:
-        return int(hours.group(1)) * 60, warnings
-
-    warnings.append("Temps non trouvé : prep_minutes/cook_minutes estimés.")
-    return None, warnings
-
-
-def _extract_servings(raw_text: str) -> tuple[int, list[str]]:
-    text = raw_text.lower()
-    match = re.search(r"(\d{1,2})\s*(?:personnes|personne|portions|portion)", text)
-    if match:
-        return int(match.group(1)), []
-
-    return 2, ["Portions non trouvées : 2 personnes par défaut."]
-
-
-def _line_looks_like_ingredient(line: str) -> bool:
-    lowered = line.lower()
-
-    if not line:
-        return False
-
-    if lowered.rstrip(":") in {
-        "ingrédients",
-        "ingredients",
-        "préparation",
-        "preparation",
-        "étapes",
-        "etapes",
-        "instructions",
-        "recette",
-    }:
-        return False
-
-    if re.match(r"^[-*•]\s+", line.strip()):
-        return True
-
-    if re.match(r"^\d+([,.]\d+)?\s*(g|kg|ml|cl|l|c\.|cuillère|cuilleres|càs|cas|pièce|pieces|gousse|gousses)?\b", lowered):
-        return True
-
-    if "," in line and len(line) < 160:
-        return True
-
-    return False
-
-
-def _extract_ingredient_lines(lines: list[str]) -> tuple[list[str], list[str]]:
-    warnings: list[str] = []
-    ingredients: list[str] = []
-    in_ingredients = False
-
-    for raw_line in lines:
-        lowered = raw_line.strip().lower().rstrip(":")
-
-        if lowered in {"ingrédients", "ingredients"}:
-            in_ingredients = True
-            continue
-
-        if lowered in {"préparation", "preparation", "étapes", "etapes", "instructions", "recette"}:
-            in_ingredients = False
-            continue
-
-        if in_ingredients or _line_looks_like_ingredient(raw_line):
-            cleaned = _clean_line(raw_line)
-            if not cleaned:
-                continue
-
-            # A comma-separated single-line ingredient list is common in pasted notes.
-            if "," in cleaned and not re.match(r"^\d", cleaned):
-                ingredients.extend(_clean_line(part) for part in cleaned.split(",") if _clean_line(part))
-            else:
-                ingredients.append(cleaned)
-
-    unique: list[str] = []
-    seen: set[str] = set()
-    for item in ingredients:
-        normalized = item.lower()
-        if normalized not in seen:
-            unique.append(item)
-            seen.add(normalized)
-
-    if not unique:
-        warnings.append("Aucun ingrédient clair trouvé.")
-
-    return unique, warnings
-
-
-def _parse_ingredient(raw: str, index: int) -> dict[str, Any]:
-    cleaned = _clean_line(raw)
-    quantity: float | None = None
-    unit: str | None = None
-    name = cleaned
-
-    match = re.match(
-        r"^(?P<quantity>\d+(?:[,.]\d+)?)\s*"
-        r"(?P<unit>kg|g|mg|l|cl|ml|c\. à soupe|c\. à café|càs|cas|cuillère|cuillere|pièce|pieces|gousse|gousses)?\s+"
-        r"(?P<name>.+)$",
-        cleaned,
-        flags=re.IGNORECASE,
-    )
-
-    if match:
-        try:
-            quantity = float(match.group("quantity").replace(",", "."))
-        except ValueError:
-            quantity = None
-
-        unit = match.group("unit")
-        name = match.group("name").strip()
-
-    return {
-        "name": name,
-        "quantity": quantity,
-        "unit": unit,
-        "category": _guess_category(name),
-        "optional": False,
-        "display_order": index,
-    }
-
-
-def _guess_category(name: str) -> str:
-    if _contains_any(name, MEAT_KEYWORDS):
-        return "viande"
-
-    if _contains_any(name, FISH_KEYWORDS):
-        return "poisson"
-
-    if _contains_any(name, DAIRY_KEYWORDS):
-        return "produits laitiers"
-
-    if _contains_any(name, EGG_KEYWORDS):
-        return "œufs"
-
-    if _contains_any(name, {"riz", "pâtes", "pates", "semoule", "boulgour", "quinoa", "lentilles", "pois chiches", "haricots"}):
-        return "épicerie"
-
-    if _contains_any(name, {"huile", "sel", "poivre", "cumin", "paprika", "sauce soja", "vinaigre"}):
-        return "placard"
-
-    return "légumes"
-
-
 async def _unique_recipe_id(session: AsyncSession, title: str) -> str:
     base = _slugify(title)
     candidate = base
@@ -290,62 +73,20 @@ async def _unique_recipe_id(session: AsyncSession, title: str) -> str:
     return candidate
 
 
-def _infer_tags(ingredient_names: list[str], total_minutes: int | None) -> tuple[list[str], list[str]]:
-    warnings: list[str] = []
-    joined = " ".join(ingredient_names)
+def _warnings_text(warnings: list[str]) -> str | None:
+    clean = [item.strip() for item in warnings if item and item.strip()]
+    if not clean:
+        return None
 
-    has_meat = _contains_any(joined, MEAT_KEYWORDS)
-    has_fish = _contains_any(joined, FISH_KEYWORDS)
-    has_egg = _contains_any(joined, EGG_KEYWORDS)
-    has_dairy = _contains_any(joined, DAIRY_KEYWORDS)
-
-    tags: list[str] = ["common_paris_ingredients"]
-
-    if has_meat:
-        tags.append("contains_meat")
-    else:
-        tags.append("no_meat")
-
-    if has_fish:
-        tags.append("contains_fish")
-    else:
-        tags.append("no_fish")
-
-    if has_egg:
-        tags.append("contains_egg")
-
-    if has_dairy:
-        tags.append("contains_dairy")
-        warnings.append("Produit laitier détecté : vérifier lactose_free / dairy_free.")
-    else:
-        tags.extend(["lactose_free", "dairy_free"])
-
-    if not has_meat and not has_fish:
-        tags.append("vegetarian")
-
-    if not has_meat and not has_fish and not has_egg and not has_dairy:
-        tags.append("vegan")
-
-    if total_minutes is not None and total_minutes <= 30:
-        tags.append("fast")
-
-    return sorted(set(tags)), warnings
+    return "\n".join(f"- {item}" for item in sorted(set(clean)))
 
 
-def _title_from_text(raw_text: str) -> str:
-    for raw_line in raw_text.splitlines():
-        line = _clean_line(raw_line)
-        if not line:
-            continue
+def _errors_text(errors: list[str]) -> str | None:
+    clean = [item.strip() for item in errors if item and item.strip()]
+    if not clean:
+        return None
 
-        lowered = line.lower()
-        if lowered.startswith(("titre:", "title:")):
-            return line.split(":", 1)[1].strip() or "Recette importée"
-
-        if lowered.rstrip(":") not in {"ingrédients", "ingredients", "préparation", "preparation"}:
-            return shorten(line, width=80, placeholder="…")
-
-    return "Recette importée"
+    return "\n".join(f"- {item}" for item in sorted(set(clean)))
 
 
 async def generate_recipe_yaml_from_text(
@@ -359,53 +100,34 @@ async def generate_recipe_yaml_from_text(
     if not normalized_raw:
         return None, None, None, [], ["Texte vide."]
 
-    title = _title_from_text(normalized_raw)
+    try:
+        data = await generate_recipe_draft_data(normalized_raw)
+    except OpenAIRecipeDraftError as exc:
+        return None, None, None, [], [str(exc)]
+
+    title = str(data.get("title") or "").strip()
+    if not title:
+        title = "Recette importée"
+        warnings.append("Titre manquant : titre par défaut utilisé.")
+
     recipe_id = await _unique_recipe_id(session, title)
 
-    lines = [line for line in normalized_raw.splitlines() if line.strip()]
-    ingredient_lines, ingredient_warnings = _extract_ingredient_lines(lines)
-    warnings.extend(ingredient_warnings)
+    ingredients = data.get("ingredients")
+    if isinstance(ingredients, list):
+        for index, ingredient in enumerate(ingredients):
+            if isinstance(ingredient, dict):
+                ingredient["display_order"] = index
 
-    ingredients = [
-        _parse_ingredient(line, index)
-        for index, line in enumerate(ingredient_lines)
-    ]
+    data["id"] = recipe_id
+    data["title"] = title
+    data["source_name"] = "import texte"
+    data["source_url"] = ""
 
-    if not ingredients:
-        errors.append("Impossible d’approuver : aucun ingrédient détecté.")
+    ai_warnings = data.get("warnings")
+    if isinstance(ai_warnings, list):
+        warnings.extend(str(item) for item in ai_warnings if str(item).strip())
 
-    servings, serving_warnings = _extract_servings(normalized_raw)
-    warnings.extend(serving_warnings)
-
-    total_minutes, minute_warnings = _extract_minutes(normalized_raw)
-    warnings.extend(minute_warnings)
-
-    if total_minutes is None:
-        prep_minutes = 10
-        cook_minutes = 20
-    else:
-        prep_minutes = min(10, total_minutes)
-        cook_minutes = max(0, total_minutes - prep_minutes)
-
-    tags, tag_warnings = _infer_tags([item["name"] for item in ingredients], total_minutes)
-    warnings.extend(tag_warnings)
-
-    short_description = f"Recette ajoutée depuis un texte par un utilisateur autorisé."
-
-    data = {
-        "id": recipe_id,
-        "title": title,
-        "short_description": short_description,
-        "source_name": "import texte",
-        "source_url": "",
-        "servings": servings,
-        "prep_minutes": prep_minutes,
-        "cook_minutes": cook_minutes,
-        "tags": tags,
-        "ingredients": ingredients,
-        "notes": normalized_raw,
-        "concerns_or_tag_ambiguity": " ".join(warnings) if warnings else "",
-    }
+    data["concerns_or_tag_ambiguity"] = " ".join(warnings)
 
     validation_errors, validation_warnings = await validate_recipe_draft_data(session, data)
     errors.extend(validation_errors)
@@ -438,6 +160,9 @@ async def validate_recipe_draft_data(
 
     if not str(data.get("title") or "").strip():
         errors.append("title manquant.")
+
+    if not str(data.get("short_description") or "").strip():
+        warnings.append("short_description manquant.")
 
     servings = data.get("servings")
     if not isinstance(servings, int) or servings <= 0:
@@ -484,8 +209,16 @@ async def validate_recipe_draft_data(
             errors.append(f"ingredient #{index} doit être un objet.")
             continue
 
-        if not str(ingredient.get("name") or "").strip():
+        name = str(ingredient.get("name") or "").strip()
+        if not name:
             errors.append(f"ingredient #{index} sans nom.")
+
+        lowered = name.lower().strip()
+        if re.match(r"^\d+\s*(personnes?|portions?)$", lowered):
+            errors.append(f"ingredient #{index} est une métadonnée, pas un ingrédient : {name}")
+
+        if re.match(r"^\d+\s*(min|minutes?)$", lowered):
+            errors.append(f"ingredient #{index} est une durée, pas un ingrédient : {name}")
 
         optional = ingredient.get("optional", False)
         if not isinstance(optional, bool):
@@ -496,20 +229,6 @@ async def validate_recipe_draft_data(
             warnings.append(f"ingredient #{index} quantity non numérique.")
 
     return errors, warnings
-
-
-def _warnings_text(warnings: list[str]) -> str | None:
-    if not warnings:
-        return None
-
-    return "\n".join(f"- {item}" for item in warnings)
-
-
-def _errors_text(errors: list[str]) -> str | None:
-    if not errors:
-        return None
-
-    return "\n".join(f"- {item}" for item in errors)
 
 
 async def create_recipe_import_draft(

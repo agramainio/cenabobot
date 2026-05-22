@@ -85,6 +85,17 @@ class TelegramGroup(Base):
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class ChatPreference(Base):
+    __tablename__ = "chat_preferences"
+
+    chat_id: Mapped[int] = mapped_column(
+        ForeignKey("telegram_groups.chat_id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    language: Mapped[str] = mapped_column(String(10), default="fr", nullable=False)
+    updated_at: Mapped[object] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class TelegramUser(Base):
     __tablename__ = "telegram_users"
 

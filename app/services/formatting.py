@@ -4,20 +4,40 @@ from decimal import Decimal
 from html import escape
 
 from app.db.models import Recipe, RecipeIngredient, RecipeTag
+from app.services.i18n import t
 
-TAG_LABELS = {
-    "vegetarian": "végétarien",
-    "no_meat": "sans viande",
-    "no_fish": "sans poisson",
-    "lactose_free": "sans lactose",
-    "dairy_free": "sans produits laitiers",
-    "contains_egg": "contient œuf",
-    "contains_dairy": "contient produits laitiers",
-    "contains_fish": "contient poisson",
-    "fast": "rapide",
-    "cheap": "économique",
-    "common_paris_ingredients": "ingrédients courants",
+
+TAG_LABEL_KEYS = {
+    "vegetarian": "tag.vegetarian",
+    "vegan": "tag.vegan",
+    "no_meat": "tag.no_meat",
+    "no_fish": "tag.no_fish",
+    "lactose_free": "tag.lactose_free",
+    "dairy_free": "tag.dairy_free",
+    "contains_egg": "tag.contains_egg",
+    "contains_dairy": "tag.contains_dairy",
+    "contains_fish": "tag.contains_fish",
+    "contains_meat": "tag.contains_meat",
+    "fast": "tag.fast",
+    "cheap": "tag.cheap",
+    "common_paris_ingredients": "tag.common_paris_ingredients",
 }
+
+PREFERRED_TAG_ORDER = [
+    "vegetarian",
+    "vegan",
+    "lactose_free",
+    "dairy_free",
+    "no_meat",
+    "no_fish",
+    "fast",
+    "cheap",
+    "common_paris_ingredients",
+    "contains_egg",
+    "contains_dairy",
+    "contains_fish",
+    "contains_meat",
+]
 
 
 def total_minutes(recipe: Recipe) -> int | None:
@@ -28,27 +48,23 @@ def total_minutes(recipe: Recipe) -> int | None:
 
 
 def tag_text(tags: list[RecipeTag]) -> str:
-    labels = [TAG_LABELS.get(tag.tag, tag.tag.replace("_", " ")) for tag in tags]
+    tag_values = [tag.tag for tag in tags]
+    ordered_values: list[str] = []
 
-    preferred_order = [
-        "végétarien",
-        "sans lactose",
-        "sans viande",
-        "rapide",
-        "économique",
-        "ingrédients courants",
+    for item in PREFERRED_TAG_ORDER:
+        if item in tag_values and item not in ordered_values:
+            ordered_values.append(item)
+
+    for item in tag_values:
+        if item not in ordered_values:
+            ordered_values.append(item)
+
+    labels = [
+        t(TAG_LABEL_KEYS.get(item, "tag.unknown"), value=item.replace("_", " "))
+        for item in ordered_values
     ]
 
-    ordered: list[str] = []
-    for item in preferred_order:
-        if item in labels and item not in ordered:
-            ordered.append(item)
-
-    for item in labels:
-        if item not in ordered:
-            ordered.append(item)
-
-    return " · ".join(ordered[:6])
+    return " · ".join(labels[:6])
 
 
 def format_quantity(value: object) -> str:
@@ -88,22 +104,22 @@ def ingredient_line(ingredient: RecipeIngredient, scale: float = 1.0) -> str:
 
 def suggestion_text(recipe: Recipe, filter_label: str | None = None) -> str:
     minutes = total_minutes(recipe)
-    time_text = f"{minutes} min" if minutes else "temps non renseigné"
+    time_text = f"{minutes} min" if minutes else t("recipe.unknown_time")
     tags = tag_text(recipe.tags)
 
-    preference = escape(filter_label) if filter_label else "repas simple"
+    preference = escape(filter_label) if filter_label else t("filter.any")
 
     return (
         f"<b>{escape(recipe.title)}</b>\n\n"
-        f"{escape(recipe.short_description or 'Une idée simple depuis ton catalogue privé.')}\n\n"
+        f"{escape(recipe.short_description or t('recipe.private_idea'))}\n\n"
         f"({escape(tags)} · {escape(time_text)})\n"
-        f"Préférence : {preference}"
+        f"{t('recipe.preference')} : {preference}"
     )
 
 
 def recipe_detail_text(recipe: Recipe) -> str:
     minutes = total_minutes(recipe)
-    time_text = f"{minutes} min" if minutes else "temps non renseigné"
+    time_text = f"{minutes} min" if minutes else t("recipe.unknown_time")
     tags = tag_text(recipe.tags)
 
     ingredients = "\n".join(
@@ -113,21 +129,21 @@ def recipe_detail_text(recipe: Recipe) -> str:
 
     source = ""
     if recipe.source_name:
-        source += f"\n\nSource : {escape(recipe.source_name)}"
+        source += f"\n\n{t('recipe.source')} : {escape(recipe.source_name)}"
     if recipe.source_url:
         source += f"\n{escape(recipe.source_url)}"
 
     return (
         f"<b>{escape(recipe.title)}</b>\n\n"
-        f"Portions : {recipe.servings}\n"
-        f"Temps : {escape(time_text)}\n"
-        f"Tags : {escape(tags)}\n\n"
-        f"<b>Ingrédients</b>\n"
-        f"{ingredients or '- Aucun ingrédient renseigné'}\n\n"
-        f"<b>Résumé</b>\n"
-        f"{escape(recipe.short_description or 'Pas encore de résumé.')}\n\n"
-        f"<b>Préparation</b>\n"
-        f"{escape(getattr(recipe, 'notes', None) or 'Pas encore de préparation détaillée.')}"
+        f"{t('recipe.portions')} : {recipe.servings}\n"
+        f"{t('recipe.time')} : {escape(time_text)}\n"
+        f"{t('recipe.tags')} : {escape(tags)}\n\n"
+        f"<b>{t('recipe.ingredients')}</b>\n"
+        f"{ingredients or t('recipe.no_ingredients')}\n\n"
+        f"<b>{t('recipe.summary')}</b>\n"
+        f"{escape(recipe.short_description or t('recipe.no_summary'))}\n\n"
+        f"<b>{t('recipe.preparation')}</b>\n"
+        f"{escape(getattr(recipe, 'notes', None) or t('recipe.no_preparation'))}"
         f"{source}"
     )
 
@@ -136,6 +152,7 @@ def shopping_list_text(recipe: Recipe, target_servings: int | None = None) -> st
     base_servings = recipe.servings or 2
     servings = target_servings or base_servings
     scale = servings / base_servings
+    plural = "s" if servings > 1 else ""
 
     grouped: dict[str, list[RecipeIngredient]] = {}
     for ingredient in recipe.ingredients:
@@ -143,7 +160,7 @@ def shopping_list_text(recipe: Recipe, target_servings: int | None = None) -> st
         grouped.setdefault(category, []).append(ingredient)
 
     lines = [
-        f"<b>Liste de courses pour {servings} personne{'s' if servings > 1 else ''}</b>",
+        f"<b>{t('shopping.title', servings=servings, plural=plural)}</b>",
         "",
         escape(recipe.title),
         "",

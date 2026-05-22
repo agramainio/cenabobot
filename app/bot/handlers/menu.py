@@ -14,6 +14,7 @@ from app.bot.keyboards.menu import (
     import_menu_keyboard,
     main_menu_keyboard,
     recipe_keyboard,
+    settings_keyboard,
     shopping_keyboard,
     suggestion_keyboard,
 )
@@ -28,6 +29,7 @@ from app.services.auth import (
     reject_message_if_untrusted_user,
 )
 from app.services.formatting import recipe_detail_text, shopping_list_text, suggestion_text
+from app.services.i18n import current_language
 from app.services.recipe_imports import (
     create_recipe_import_draft,
     draft_display_title,
@@ -362,6 +364,92 @@ async def show_menu(callback: CallbackQuery) -> None:
         )
 
 
+@router.callback_query(F.data == "settings:menu")
+async def show_settings_menu(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+    await callback.answer()
+
+    language_label = "Français" if current_language() == "fr" else "Italiano"
+
+    if callback.message:
+        await callback.message.edit_text(
+            "⚙️ <b>Réglages</b>\n\n"
+            f"Langue actuelle : <b>{language_label}</b>\n\n"
+            "Pour ce premier passage V2.6, la langue est globale et se règle avec "
+            "<code>APP_LANGUAGE=fr</code> ou <code>APP_LANGUAGE=it</code> dans "
+            "<code>.env.production</code>.\n\n"
+            "Les IDs de recettes et les tags restent internes et non traduits.",
+            reply_markup=settings_keyboard(),
+        )
+
+
+@router.callback_query(F.data == "settings:language")
+async def show_language_settings(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    await callback.answer()
+
+    if callback.message:
+        await callback.message.edit_text(
+            "🌐 <b>Langue</b>\n\n"
+            "La langue est globale pour cette version.\n\n"
+            "Sur le VPS, règle :\n"
+            "<code>APP_LANGUAGE=fr</code> pour le français\n"
+            "<code>APP_LANGUAGE=it</code> pour l’italien\n\n"
+            "Puis redémarre le bot.\n\n"
+            "Les nouvelles recettes importées par OpenAI suivent cette langue. "
+            "Les recettes déjà existantes ne sont pas traduites automatiquement.",
+            reply_markup=settings_keyboard(),
+        )
+
+
+@router.callback_query(F.data == "settings:help")
+async def show_settings_help(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    await callback.answer()
+
+    if callback.message:
+        await callback.message.edit_text(
+            "❔ <b>Aide</b>\n\n"
+            "cenabobot propose une recette fiable à la fois depuis le catalogue privé.\n\n"
+            "En groupe, chacun peut répondre :\n"
+            "✅ Ça me va\n"
+            "🙅 Pas ce soir\n\n"
+            "Tu peux aussi ajouter une recette depuis un lien ou un texte. "
+            "Le bot prépare un brouillon, mais rien n’entre dans le catalogue sans approbation.",
+            reply_markup=settings_keyboard(),
+        )
+
+
+@router.callback_query(F.data == "settings:setup")
+async def show_settings_setup(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    await callback.answer()
+
+    user_id = callback.from_user.id if callback.from_user else None
+    chat_id = callback.message.chat.id if callback.message else None
+
+    if callback.message:
+        await callback.message.edit_text(
+            "⚙️ <b>Configuration</b>\n\n"
+            f"User ID : <code>{user_id}</code>\n"
+            f"Chat ID : <code>{chat_id}</code>\n\n"
+            "Sur le VPS :\n"
+            "1. Ouvre <code>/opt/cenabobot/.env.production</code>\n"
+            "2. Ajoute ce Chat ID à <code>ALLOWED_CHAT_IDS</code> si nécessaire\n"
+            "3. Redémarre le bot.",
+            reply_markup=settings_keyboard(),
+        )
+
+
 @router.callback_query(F.data == "help:menu")
 async def show_help_menu(callback: CallbackQuery) -> None:
     if await reject_callback_if_unauthorized(callback):
@@ -378,7 +466,7 @@ async def show_help_menu(callback: CallbackQuery) -> None:
             "🙅 Pas ce soir\n\n"
             "Règle importante : aucune recette inventée en direct. "
             "Une recette doit être enregistrée avant d’être proposée.",
-            reply_markup=main_menu_keyboard(),
+            reply_markup=settings_keyboard(),
         )
 
 

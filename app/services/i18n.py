@@ -236,3 +236,9 @@ def t(key: str, **kwargs: object) -> str:
 def filter_label(filter_key: str | None) -> str:
     key = filter_key or "any"
     return t(f"filter.{key}") if f"filter.{key}" in TRANSLATIONS[current_language()] else t("filter.any")
+
+
+
+def language_name(language: str | None = None) -> str:
+    normalized = normalize_language(language or current_language())
+    return t(f"language.{normalized}")

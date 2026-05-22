@@ -30,10 +30,16 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
 
 
 def settings_keyboard() -> InlineKeyboardMarkup:
-    language_label = "Français" if current_language() == "fr" else "Italiano"
+    language = current_language()
+    fr_label = "✅ Français" if language == "fr" else "Français"
+    it_label = "✅ Italiano" if language == "it" else "Italiano"
+
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=f"{t('settings.language')} : {language_label}", callback_data="settings:language")],
+            [
+                InlineKeyboardButton(text=f"🇫🇷 {fr_label}", callback_data="settings:language:fr"),
+                InlineKeyboardButton(text=f"🇮🇹 {it_label}", callback_data="settings:language:it"),
+            ],
             [
                 InlineKeyboardButton(text=t("settings.help"), callback_data="settings:help"),
                 InlineKeyboardButton(text=t("settings.setup"), callback_data="settings:setup"),

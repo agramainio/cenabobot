@@ -9,6 +9,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
 
 from app.bot.handlers.menu import router as menu_router
+from app.bot.middleware.language import ChatLanguageMiddleware
 from app.settings.config import settings
 from app.services.i18n import t
 
@@ -42,6 +43,8 @@ async def main() -> None:
     await set_bot_commands(bot)
 
     dispatcher = Dispatcher()
+    dispatcher.message.middleware(ChatLanguageMiddleware())
+    dispatcher.callback_query.middleware(ChatLanguageMiddleware())
     dispatcher.include_router(menu_router)
 
     await bot.delete_webhook(drop_pending_updates=True)

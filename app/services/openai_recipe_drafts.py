@@ -6,6 +6,7 @@ from typing import Any
 from openai import AsyncOpenAI
 
 from app.settings.config import settings
+from app.services.i18n import current_language
 
 
 class OpenAIRecipeDraftError(RuntimeError):
@@ -128,7 +129,7 @@ RECIPE_DRAFT_SCHEMA: dict[str, Any] = {
 
 
 def _output_language_name() -> str:
-    language = settings.APP_LANGUAGE.lower().strip()
+    language = current_language()
 
     if language == "it":
         return "italien"

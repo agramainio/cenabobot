@@ -29,7 +29,8 @@ from app.services.auth import (
     reject_message_if_untrusted_user,
 )
 from app.services.formatting import recipe_detail_text, shopping_list_text, suggestion_text
-from app.services.i18n import current_language
+from app.services.chat_preferences import set_chat_language
+from app.services.i18n import current_language, filter_label, set_language_context, t
 from app.services.recipe_imports import (
     create_recipe_import_draft,
     draft_display_title,
@@ -372,18 +373,49 @@ async def show_settings_menu(callback: CallbackQuery) -> None:
     await _ensure_actor_from_callback(callback)
     await callback.answer()
 
-    language_label = "Français" if current_language() == "fr" else "Italiano"
+    language_label = t(f"language.{current_language()}")
 
     if callback.message:
         await callback.message.edit_text(
-            "⚙️ <b>Réglages</b>\n\n"
-            f"Langue actuelle : <b>{language_label}</b>\n\n"
-            "Pour ce premier passage V2.6, la langue est globale et se règle avec "
-            "<code>APP_LANGUAGE=fr</code> ou <code>APP_LANGUAGE=it</code> dans "
-            "<code>.env.production</code>.\n\n"
-            "Les IDs de recettes et les tags restent internes et non traduits.",
+            f"{t('settings.title')}
+
+"
+            + t("settings.body", language=language_label),
             reply_markup=settings_keyboard(),
         )
+
+
+@router.callback_query(F.data.startswith("settings:language:"))
+async def set_language_from_ui(callback: CallbackQuery) -> None:
+    if await reject_callback_if_unauthorized(callback):
+        return
+
+    await _ensure_actor_from_callback(callback)
+
+    if not callback.data or not callback.message:
+        await callback.answer()
+        return
+
+    _, _, language = callback.data.split(":", 2)
+
+    async with AsyncSessionLocal() as session:
+        selected_language = await set_chat_language(
+            session,
+            chat_id=callback.message.chat.id,
+            language=language,
+        )
+
+    set_language_context(selected_language)
+    await callback.answer(t("settings.language_saved"), show_alert=False)
+
+    language_label = t(f"language.{current_language()}")
+    await callback.message.edit_text(
+        f"{t('settings.title')}
+
+"
+        + t("settings.body", language=language_label),
+        reply_markup=settings_keyboard(),
+    )
 
 
 @router.callback_query(F.data == "settings:language")
@@ -395,14 +427,10 @@ async def show_language_settings(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            "🌐 <b>Langue</b>\n\n"
-            "La langue est globale pour cette version.\n\n"
-            "Sur le VPS, règle :\n"
-            "<code>APP_LANGUAGE=fr</code> pour le français\n"
-            "<code>APP_LANGUAGE=it</code> pour l’italien\n\n"
-            "Puis redémarre le bot.\n\n"
-            "Les nouvelles recettes importées par OpenAI suivent cette langue. "
-            "Les recettes déjà existantes ne sont pas traduites automatiquement.",
+            f"{t('settings.language_title')}
+
+"
+            + t("settings.language_body"),
             reply_markup=settings_keyboard(),
         )
 
@@ -416,13 +444,10 @@ async def show_settings_help(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            "❔ <b>Aide</b>\n\n"
-            "cenabobot propose une recette fiable à la fois depuis le catalogue privé.\n\n"
-            "En groupe, chacun peut répondre :\n"
-            "✅ Ça me va\n"
-            "🙅 Pas ce soir\n\n"
-            "Tu peux aussi ajouter une recette depuis un lien ou un texte. "
-            "Le bot prépare un brouillon, mais rien n’entre dans le catalogue sans approbation.",
+            f"{t('settings.help_title')}
+
+"
+            + t("settings.help_body"),
             reply_markup=settings_keyboard(),
         )
 
@@ -439,13 +464,10 @@ async def show_settings_setup(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            "⚙️ <b>Configuration</b>\n\n"
-            f"User ID : <code>{user_id}</code>\n"
-            f"Chat ID : <code>{chat_id}</code>\n\n"
-            "Sur le VPS :\n"
-            "1. Ouvre <code>/opt/cenabobot/.env.production</code>\n"
-            "2. Ajoute ce Chat ID à <code>ALLOWED_CHAT_IDS</code> si nécessaire\n"
-            "3. Redémarre le bot.",
+            f"{t('settings.setup_title')}
+
+"
+            + t("settings.setup_body", user_id=user_id, chat_id=chat_id),
             reply_markup=settings_keyboard(),
         )
 
@@ -827,7 +849,7 @@ async def _send_suggestion(
     if is_group and proposal is not None:
         text = _proposal_text(
             recipe,
-            filter_label=FILTER_LABELS.get(filter_key),
+            filter_label=filter_label(filter_key),
             votes=[],
             proposal=proposal,
         )
@@ -851,7 +873,7 @@ async def _send_suggestion(
         return
 
     await callback.message.edit_text(
-        suggestion_text(recipe, FILTER_LABELS.get(filter_key)),
+        suggestion_text(recipe, filter_label(filter_key)),
         reply_markup=suggestion_keyboard(recipe.id, filter_key, recipe.servings),
     )
 
@@ -900,7 +922,7 @@ async def vote(callback: CallbackQuery) -> None:
     filter_key = proposal.filter_key or "any"
     text = _proposal_text(
         recipe,
-        filter_label=FILTER_LABELS.get(filter_key),
+        filter_label=filter_label(filter_key),
         votes=votes,
         proposal=proposal,
     )
@@ -963,7 +985,7 @@ async def mark_done(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
         _proposal_text(
             recipe,
-            filter_label=FILTER_LABELS.get(filter_key),
+            filter_label=filter_label(filter_key),
             votes=votes,
             proposal=proposal,
         ),

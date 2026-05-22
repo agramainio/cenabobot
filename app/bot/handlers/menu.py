@@ -13,6 +13,7 @@ from app.bot.keyboards.menu import (
     import_drafts_keyboard,
     import_menu_keyboard,
     main_menu_keyboard,
+    main_menu_reply_keyboard,
     recipe_keyboard,
     settings_keyboard,
     shopping_keyboard,
@@ -289,7 +290,7 @@ async def start(message: Message) -> None:
     await message.answer(
         "cenabobot est prêt.\n\n"
         "Une idée de repas fiable à la fois.",
-        reply_markup=main_menu_keyboard(),
+        reply_markup=main_menu_reply_keyboard(),
     )
 
 
@@ -359,9 +360,9 @@ async def show_menu(callback: CallbackQuery) -> None:
     await callback.answer()
 
     if callback.message:
-        await callback.message.edit_text(
-            "Que veux-tu faire ?",
-            reply_markup=main_menu_keyboard(),
+        await callback.message.answer(
+            t("menu.prompt"),
+            reply_markup=main_menu_reply_keyboard(),
         )
 
 
@@ -412,7 +413,7 @@ async def set_language_from_ui(callback: CallbackQuery) -> None:
 
     await callback.message.answer(
         t("menu.prompt"),
-        reply_markup=main_menu_keyboard(),
+        reply_markup=main_menu_reply_keyboard(),
     )
 
 
@@ -1161,6 +1162,174 @@ async def receive_import_input(message: Message) -> None:
         _draft_preview_text(draft),
         reply_markup=import_draft_keyboard(draft.id),
         link_preview_options=NO_LINK_PREVIEW,
+    )
+
+
+def _main_menu_action(value: str) -> tuple[str, str | None] | None:
+    actions = {
+        "🍽️ Proposer un repas": ("suggest", "any"),
+        "🍽️ Suggerisci una ricetta": ("suggest", "any"),
+        "🥬 Végétarien": ("suggest", "vegetarian"),
+        "🥬 Vegetariano": ("suggest", "vegetarian"),
+        "⚡ Rapide": ("suggest", "fast"),
+        "⚡ Veloce": ("suggest", "fast"),
+        "🚫 Sans viande": ("suggest", "no_meat"),
+        "🚫 Senza carne": ("suggest", "no_meat"),
+        "🥛 Sans lactose": ("suggest", "no_lactose"),
+        "🥛 Senza lattosio": ("suggest", "no_lactose"),
+        "⭐ Favoris": ("favorites", None),
+        "⭐ Preferiti": ("favorites", None),
+        "📝 Ajouter une recette": ("import", None),
+        "📝 Aggiungi ricetta": ("import", None),
+        "📚 En attente": ("pending", None),
+        "📚 In attesa": ("pending", None),
+        "⚙️ Réglages": ("settings", None),
+        "⚙️ Impostazioni": ("settings", None),
+    }
+    return actions.get(value.strip())
+
+
+@router.message(lambda message: bool(message.text) and _main_menu_action(message.text) is not None)
+async def main_menu_reply_action(message: Message) -> None:
+    if await reject_message_if_unauthorized(message):
+        return
+
+    await _ensure_actor_from_message(message)
+
+    action = _main_menu_action(message.text or "")
+    if action is None:
+        return
+
+    name, value = action
+
+    if name == "suggest":
+        await _send_suggestion_from_message(message, value or "any")
+        return
+
+    if name == "favorites":
+        await _send_favorites_from_message(message)
+        return
+
+    if name == "import":
+        await message.answer(
+            "📝 <b>Ajouter une recette</b>\n\nChoisis une source.",
+            reply_markup=import_menu_keyboard(),
+        )
+        return
+
+    if name == "pending":
+        await _send_pending_imports_from_message(message)
+        return
+
+    if name == "settings":
+        await message.answer(
+            f"{t('settings.title')}\n\n"
+            + t("settings.body", language=language_name()),
+            reply_markup=settings_keyboard(),
+        )
+        return
+
+
+async def _send_suggestion_from_message(message: Message, filter_key: str) -> None:
+    filter_key = filter_key if filter_key in FILTER_LABELS else "any"
+    is_group = _is_group_chat(message)
+
+    async with AsyncSessionLocal() as session:
+        recipe = await get_one_suggestion(
+            session,
+            chat_id=message.chat.id,
+            user_id=message.from_user.id if message.from_user else None,
+            filter_key=filter_key,
+        )
+
+        if recipe is None:
+            await message.answer(
+                "Aucune recette enregistrée ne correspond encore.",
+                reply_markup=main_menu_reply_keyboard(),
+            )
+            return
+
+        proposal = None
+        if is_group:
+            proposal = await create_meal_proposal(
+                session,
+                chat_id=message.chat.id,
+                message_id=None,
+                recipe_id=recipe.id,
+                filter_key=filter_key,
+                created_by_user_id=message.from_user.id if message.from_user else None,
+            )
+
+    if is_group and proposal is not None:
+        sent_message = await message.answer(
+            _proposal_text(
+                recipe,
+                filter_label=filter_label(filter_key),
+                votes=[],
+                proposal=proposal,
+            ),
+            reply_markup=suggestion_keyboard(
+                recipe.id,
+                filter_key,
+                recipe.servings,
+                proposal_id=proposal.id,
+            ),
+        )
+
+        async with AsyncSessionLocal() as session:
+            await set_meal_proposal_message_id(
+                session,
+                proposal_id=proposal.id,
+                message_id=sent_message.message_id,
+            )
+        return
+
+    await message.answer(
+        suggestion_text(recipe, filter_label(filter_key)),
+        reply_markup=suggestion_keyboard(recipe.id, filter_key, recipe.servings),
+    )
+
+
+async def _send_favorites_from_message(message: Message) -> None:
+    if not message.from_user:
+        return
+
+    async with AsyncSessionLocal() as session:
+        recipes = await get_favorites(
+            session,
+            chat_id=message.chat.id,
+            user_id=message.from_user.id,
+        )
+
+    if not recipes:
+        await message.answer("Aucun favori pour l’instant.", reply_markup=main_menu_reply_keyboard())
+        return
+
+    lines = ["<b>Favoris</b>", ""]
+    for index, recipe in enumerate(recipes, start=1):
+        lines.append(f"{index}. {recipe.title}")
+
+    await message.answer(
+        "\n".join(lines),
+        reply_markup=favorites_keyboard([recipe.id for recipe in recipes]),
+    )
+
+
+async def _send_pending_imports_from_message(message: Message) -> None:
+    async with AsyncSessionLocal() as session:
+        drafts = await list_pending_recipe_import_drafts(session)
+
+    if not drafts:
+        await message.answer(
+            "📚 <b>Recettes en attente</b>\n\nAucun brouillon en attente pour l’instant.",
+            reply_markup=import_menu_keyboard(),
+        )
+        return
+
+    items = [(draft.id, draft_display_title(draft)) for draft in drafts]
+    await message.answer(
+        "📚 <b>Recettes en attente</b>\n\nChoisis un brouillon à ouvrir.",
+        reply_markup=import_drafts_keyboard(items),
     )
 
 

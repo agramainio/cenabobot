@@ -1,8 +1,27 @@
 from __future__ import annotations
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+)
 
 from app.services.i18n import current_language, t
+
+
+def main_menu_reply_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=t("main.suggest"))],
+            [KeyboardButton(text=t("main.vegetarian")), KeyboardButton(text=t("main.fast"))],
+            [KeyboardButton(text=t("main.no_meat")), KeyboardButton(text=t("main.no_lactose"))],
+            [KeyboardButton(text=t("main.favorites")), KeyboardButton(text=t("main.add_recipe"))],
+            [KeyboardButton(text=t("main.pending")), KeyboardButton(text=t("main.settings"))],
+        ],
+        resize_keyboard=True,
+        input_field_placeholder=t("menu.placeholder"),
+    )
 
 
 def main_menu_keyboard() -> InlineKeyboardMarkup:
@@ -95,7 +114,6 @@ def suggestion_keyboard(
         rows.append([InlineKeyboardButton(text=t("meal.reject"), callback_data=f"reject:{filter_key}:{recipe_id}")])
 
     rows.append([InlineKeyboardButton(text=t("menu"), callback_data="menu")])
-
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 

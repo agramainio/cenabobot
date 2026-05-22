@@ -41,6 +41,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "language.fr": "Français",
         "language.it": "Italiano",
 
+        "menu.prompt": "Choisis une action",
+        "menu.placeholder": "Choisis une action",
+
         "main.suggest": "🍽️ Proposer un repas",
         "main.vegetarian": "🥬 Végétarien",
         "main.fast": "⚡ Rapide",
@@ -133,9 +136,12 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "language.fr": "Français",
         "language.it": "Italiano",
 
-        "main.suggest": "🍽️ Proponi un pasto",
+        "menu.prompt": "Scegli un’azione",
+        "menu.placeholder": "Scegli un’azione",
+
+        "main.suggest": "🍽️ Suggerisci una ricetta",
         "main.vegetarian": "🥬 Vegetariano",
-        "main.fast": "⚡ Rapido",
+        "main.fast": "⚡ Veloce",
         "main.no_meat": "🚫 Senza carne",
         "main.no_lactose": "🥛 Senza lattosio",
         "main.favorites": "⭐ Preferiti",
@@ -182,7 +188,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "filter.vegetarian": "vegetariano",
         "filter.no_lactose": "senza lattosio",
         "filter.no_meat": "senza carne",
-        "filter.fast": "rapido",
+        "filter.fast": "veloce",
 
         "recipe.portions": "Porzioni",
         "recipe.time": "Tempo",
@@ -210,7 +216,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "tag.contains_dairy": "contiene latticini",
         "tag.contains_fish": "contiene pesce",
         "tag.contains_meat": "contiene carne",
-        "tag.fast": "rapido",
+        "tag.fast": "veloce",
         "tag.cheap": "economico",
         "tag.common_paris_ingredients": "ingredienti comuni",
         "tag.unknown": "{value}",

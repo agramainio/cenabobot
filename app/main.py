@@ -10,17 +10,18 @@ from aiogram.types import BotCommand
 
 from app.bot.handlers.menu import router as menu_router
 from app.settings.config import settings
+from app.services.i18n import t
 
 
 
 async def set_bot_commands(bot: Bot) -> None:
     await bot.set_my_commands(
         [
-            BotCommand(command="start", description="Ouvrir le menu"),
-            BotCommand(command="help", description="Aide"),
-            BotCommand(command="import", description="Ajouter une recette"),
-            BotCommand(command="whoami", description="Afficher mes IDs Telegram"),
-            BotCommand(command="setup", description="Configuration du groupe"),
+            BotCommand(command="start", description=t("commands.start")),
+            BotCommand(command="help", description=t("commands.help")),
+            BotCommand(command="import", description=t("commands.import")),
+            BotCommand(command="whoami", description=t("commands.whoami")),
+            BotCommand(command="setup", description=t("commands.setup")),
         ]
     )
 

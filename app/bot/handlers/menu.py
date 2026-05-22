@@ -373,14 +373,10 @@ async def show_settings_menu(callback: CallbackQuery) -> None:
     await _ensure_actor_from_callback(callback)
     await callback.answer()
 
-    language_label = t(f"language.{current_language()}")
-
     if callback.message:
         await callback.message.edit_text(
-            f"{t('settings.title')}
-
-"
-            + t("settings.body", language=language_label),
+            f"{t('settings.title')}\\n\\n"
+            + t("settings.body", language=language_name()),
             reply_markup=settings_keyboard(),
         )
 
@@ -408,31 +404,16 @@ async def set_language_from_ui(callback: CallbackQuery) -> None:
     set_language_context(selected_language)
     await callback.answer(t("settings.language_saved"), show_alert=False)
 
-    language_label = t(f"language.{current_language()}")
     await callback.message.edit_text(
-        f"{t('settings.title')}
-
-"
-        + t("settings.body", language=language_label),
+        f"{t('settings.title')}\\n\\n"
+        + t("settings.body", language=language_name()),
         reply_markup=settings_keyboard(),
     )
 
-
-@router.callback_query(F.data == "settings:language")
-async def show_language_settings(callback: CallbackQuery) -> None:
-    if await reject_callback_if_unauthorized(callback):
-        return
-
-    await callback.answer()
-
-    if callback.message:
-        await callback.message.edit_text(
-            f"{t('settings.language_title')}
-
-"
-            + t("settings.language_body"),
-            reply_markup=settings_keyboard(),
-        )
+    await callback.message.answer(
+        t("menu.prompt"),
+        reply_markup=main_menu_reply_keyboard(),
+    )
 
 
 @router.callback_query(F.data == "settings:help")
@@ -444,10 +425,7 @@ async def show_settings_help(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            f"{t('settings.help_title')}
-
-"
-            + t("settings.help_body"),
+            f"{t('settings.help_title')}\\n\\n" + t("settings.help_body"),
             reply_markup=settings_keyboard(),
         )
 
@@ -464,9 +442,7 @@ async def show_settings_setup(callback: CallbackQuery) -> None:
 
     if callback.message:
         await callback.message.edit_text(
-            f"{t('settings.setup_title')}
-
-"
+            f"{t('settings.setup_title')}\\n\\n"
             + t("settings.setup_body", user_id=user_id, chat_id=chat_id),
             reply_markup=settings_keyboard(),
         )

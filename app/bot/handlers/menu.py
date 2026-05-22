@@ -30,7 +30,7 @@ from app.services.auth import (
 )
 from app.services.formatting import recipe_detail_text, shopping_list_text, suggestion_text
 from app.services.chat_preferences import set_chat_language
-from app.services.i18n import current_language, filter_label, set_language_context, t
+from app.services.i18n import current_language, filter_label, language_name, set_language_context, t
 from app.services.recipe_imports import (
     create_recipe_import_draft,
     draft_display_title,
@@ -412,7 +412,7 @@ async def set_language_from_ui(callback: CallbackQuery) -> None:
 
     await callback.message.answer(
         t("menu.prompt"),
-        reply_markup=main_menu_reply_keyboard(),
+        reply_markup=main_menu_keyboard(),
     )
 
 

@@ -19,12 +19,12 @@ RECIPE_DRAFT_SCHEMA: dict[str, Any] = {
     "properties": {
         "title": {
             "type": "string",
-            "description": "Short French recipe title.",
+            "description": "Short recipe title in the requested output language.",
         },
         "short_description": {
             "type": "string",
             "description": (
-                "Compact French preparation summary. This should be useful as the recipe card notes. "
+                "Compact preparation summary in the requested output language. This should be useful as the recipe card notes. "
                 "Do not write a generic import sentence."
             ),
         },
@@ -82,7 +82,7 @@ RECIPE_DRAFT_SCHEMA: dict[str, Any] = {
                     },
                     "category": {
                         "type": ["string", "null"],
-                        "description": "Useful shopping category in French.",
+                        "description": "Useful shopping category in the requested output language.",
                     },
                     "optional": {
                         "type": "boolean",
@@ -105,7 +105,7 @@ RECIPE_DRAFT_SCHEMA: dict[str, Any] = {
         },
         "notes": {
             "type": "string",
-            "description": "Concise French preparation instructions extracted or rewritten from the pasted text.",
+            "description": "Concise preparation instructions in the requested output language extracted or rewritten from the pasted text.",
         },
         "warnings": {
             "type": "array",
